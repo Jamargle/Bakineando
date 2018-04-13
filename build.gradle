@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0'
+        classpath 'com.android.tools.build:gradle:3.1.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -27,19 +27,21 @@ task clean(type: Delete) {
 
 ext {
     // Sdk and tools
-    minSdkVersion = 19
+    minSdkVersion = 18
     targetSdkVersion = 27
     compileSdkVersion = 27
     buildToolsVersion = '27.0.3'
 
     // App dependencies
-    supportLibraryVersion = '27.1.0'
+    supportLibraryVersion = '27.1.1'
     butterknifeVersion = '8.8.1'
     picassoVersion = '2.5.2'
     retrofitVersion = '2.3.0'
     // RxJava
     rxJavaVersion = '2.1.10'
     rxAndroidVersion = '2.0.2'
+    // Dagger2
+    dagger2Version = '2.14.1'
 
     junitVersion = '4.12'
     runnerVersion = '1.0.1'
