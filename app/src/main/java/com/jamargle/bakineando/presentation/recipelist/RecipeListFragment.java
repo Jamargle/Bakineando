@@ -10,7 +10,6 @@ import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.presentation.BaseFragment;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Callback> {
 
@@ -18,19 +17,24 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
 
     @Override
     public View onCreateView(
-            final LayoutInflater inflater,
+            @NonNull final LayoutInflater inflater,
             final ViewGroup container,
             final Bundle savedInstanceState) {
 
-        final View rootView = inflater.inflate(R.layout.fragment_recipe_list, container, false);
-        ButterKnife.bind(this, rootView);
+        final View view = super.onCreateView(inflater, container, savedInstanceState);
         initRecyclerView();
-        return rootView;
+        initViewModel();
+        return view;
     }
 
     @Override
     protected boolean isToBeRetained() {
         return true;
+    }
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.fragment_recipe_list;
     }
 
     private void initRecyclerView() {

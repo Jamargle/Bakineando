@@ -2,9 +2,15 @@ package com.jamargle.bakineando.presentation;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import butterknife.ButterKnife;
 import dagger.android.support.AndroidSupportInjection;
 
 public abstract class BaseFragment<C> extends Fragment {
@@ -31,6 +37,17 @@ public abstract class BaseFragment<C> extends Fragment {
     }
 
     @Override
+    public View onCreateView(
+            @NonNull final LayoutInflater inflater,
+            @Nullable final ViewGroup container,
+            @Nullable final Bundle savedInstanceState) {
+
+        final View rootView = inflater.inflate(getLayoutResourceId(), container, false);
+        ButterKnife.bind(this, rootView);
+        return rootView;
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         callback = null;
@@ -41,5 +58,7 @@ public abstract class BaseFragment<C> extends Fragment {
      * a configuration change)
      */
     protected abstract boolean isToBeRetained();
+
+    protected abstract @LayoutRes int getLayoutResourceId();
 
 }

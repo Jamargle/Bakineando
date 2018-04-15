@@ -2,6 +2,7 @@ package com.jamargle.bakineando.presentation.recipedetail;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,21 +51,29 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.recipe_detail, container, false);
+    public View onCreateView(
+            @NonNull final LayoutInflater inflater,
+            final ViewGroup container,
+            final Bundle savedInstanceState) {
+
+        final View view = super.onCreateView(inflater, container, savedInstanceState);
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.recipe_detail)).setText(mItem.details);
+            ((TextView) view.findViewById(R.id.recipe_detail)).setText(mItem.details);
         }
 
-        return rootView;
+        return view;
     }
 
     @Override
     protected boolean isToBeRetained() {
         return true;
+    }
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.recipe_detail;
     }
 
     interface Callback {
