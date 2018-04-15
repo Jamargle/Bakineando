@@ -28,6 +28,11 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
         return rootView;
     }
 
+    @Override
+    protected boolean isToBeRetained() {
+        return true;
+    }
+
     private void initRecyclerView() {
 
     interface Callback {

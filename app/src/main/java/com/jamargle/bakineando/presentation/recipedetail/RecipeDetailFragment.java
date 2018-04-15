@@ -62,6 +62,11 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
         return rootView;
     }
 
+    @Override
+    protected boolean isToBeRetained() {
+        return true;
+    }
+
     interface Callback {
     }
 
