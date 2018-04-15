@@ -1,19 +1,31 @@
 package com.jamargle.bakineando.presentation.recipelist;
 
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.jamargle.bakineando.R;
+import com.jamargle.bakineando.di.ViewModelFactory;
 import com.jamargle.bakineando.presentation.BaseFragment;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 
 public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Callback> {
 
-    @BindView(R.id.recipe_list) RecyclerView recipeListView;
+    @BindView(R.id.recipes_recycler_view) RecyclerView recipeListView;
+
+    @Inject ViewModelFactory viewModelFactory;
+
+    private RecipeListViewModel recipeListViewModel;
 
     @Override
     public View onCreateView(
@@ -38,6 +50,11 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
     }
 
     private void initRecyclerView() {
+    }
+
+    private void initViewModel() {
+        recipeListViewModel = ViewModelProviders.of(this, viewModelFactory).get(RecipeListViewModel.class);
+    }
 
     interface Callback {
 
