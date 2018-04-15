@@ -24,7 +24,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public final class RecipeListActivity extends BaseActivity {
+public final class RecipeListActivity extends BaseActivity
+        implements RecipeListFragment.Callback {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
 

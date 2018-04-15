@@ -12,7 +12,7 @@ import com.jamargle.bakineando.presentation.BaseFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public final class RecipeListFragment extends BaseFragment {
+public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Callback> {
 
     @BindView(R.id.recipe_list) RecyclerView recipeListView;
 
@@ -29,6 +29,8 @@ public final class RecipeListFragment extends BaseFragment {
     }
 
     private void initRecyclerView() {
+
+    interface Callback {
 
     }
 

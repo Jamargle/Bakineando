@@ -12,7 +12,7 @@ import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.domain.dummy.DummyContent;
 import com.jamargle.bakineando.presentation.BaseFragment;
 
-public final class RecipeDetailFragment extends BaseFragment {
+public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragment.Callback> {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -61,4 +61,8 @@ public final class RecipeDetailFragment extends BaseFragment {
 
         return rootView;
     }
+
+    interface Callback {
+    }
+
 }
