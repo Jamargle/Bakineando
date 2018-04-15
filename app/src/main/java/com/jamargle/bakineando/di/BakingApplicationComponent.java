@@ -12,9 +12,7 @@ import javax.inject.Singleton;
 @Component(modules = {
         BakingApplicationModule.class,
         AndroidSupportInjectionModule.class,
-        ActivityBuilder.class,
-        FragmentBuilder.class,
-        ViewModelFactoryModule.class
+        ActivityBuilder.class
 })
 public interface BakingApplicationComponent extends AndroidInjector<BakineandoApp> {
 

@@ -9,7 +9,14 @@ import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-@Module
+@Module(
+        includes = {
+                ViewModelModule.class
+        },
+        subcomponents = {
+                RecipeListFragmentComponent.class,
+                RecipeDetailFragmentComponent.class
+        })
 public final class BakingApplicationModule {
 
     public static final String SCHEDULER_MAIN_THREAD = "mainThread_scheduler";

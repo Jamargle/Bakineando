@@ -2,7 +2,9 @@ package com.jamargle.bakineando;
 
 import android.app.Activity;
 import android.app.Application;
+
 import com.jamargle.bakineando.di.DaggerBakingApplicationComponent;
+
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
