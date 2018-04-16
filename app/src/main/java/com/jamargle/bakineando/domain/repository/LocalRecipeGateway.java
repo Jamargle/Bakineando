@@ -13,4 +13,6 @@ public interface LocalRecipeGateway {
 
     Completable delete(Recipe recipeToDelete);
 
+    boolean isToBeRefreshed();
+
 }
