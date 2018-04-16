@@ -13,24 +13,16 @@
     android:showDividers="middle"
     tools:context=".presentation.recipelist.RecipeListActivity">
 
-    <!--
-    This layout is a two-pane layout for the Recipes
-    master/detail flow.
-    
-    -->
-
     <android.support.v7.widget.RecyclerView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/recipe_list"
+        android:id="@+id/recipes_recycler_view"
         android:name="com.jamargle.bakineando.RecipeListFragment"
-        android:layout_width="@dimen/item_width"
+        android:layout_width="@dimen/recipe_list_item_width"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         tools:context="com.jamargle.bakineando.presentation.recipelist.RecipeListActivity"
-        tools:listitem="@layout/recipe_list_content"/>
+        tools:listitem="@layout/item_list_recipe"/>
 
     <FrameLayout
         android:id="@+id/recipe_detail_container"
