@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def recipesAPiBaseUrl = '"https://d17h27t6h515a5.cloudfront.net/"'
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -16,6 +18,9 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        buildTypes.each {
+            it.buildConfigField 'String', 'RECIPE_API_BASE_URL', recipesAPiBaseUrl
         }
     }
 }
