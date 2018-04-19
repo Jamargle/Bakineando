@@ -1,6 +1,8 @@
 package com.jamargle.bakineando.domain.model;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 import static com.jamargle.bakineando.domain.model.Step.TABLE_NAME;
@@ -9,13 +11,25 @@ import static com.jamargle.bakineando.domain.model.Step.TABLE_NAME;
 public final class Ingredient {
 
     public static final String TABLE_NAME = "ingredients";
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_QUANTITY = "quantity";
+    public static final String COLUMN_MEASURE = "measure";
+    public static final String COLUMN_INGREDIENT = "ingredient";
 
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(index = true, name = COLUMN_ID)
     private int id;
+
+    @ColumnInfo(name = COLUMN_QUANTITY)
     private float quantity;
+
+    @ColumnInfo(name = COLUMN_MEASURE)
     private String measure;
+
+    @ColumnInfo(name = COLUMN_INGREDIENT)
     private String ingredient;
 
+    @Ignore
     public Ingredient(final Builder builder) {
         this.id = builder.id;
         this.quantity = builder.quantity;
