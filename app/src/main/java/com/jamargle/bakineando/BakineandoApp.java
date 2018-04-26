@@ -2,9 +2,8 @@ package com.jamargle.bakineando;
 
 import android.app.Activity;
 import android.app.Application;
-
+import com.facebook.stetho.Stetho;
 import com.jamargle.bakineando.di.DaggerBakingApplicationComponent;
-
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
@@ -22,6 +21,8 @@ public final class BakineandoApp extends Application implements HasActivityInjec
                 .application(this)
                 .build()
                 .inject(this);
+
+        Stetho.initializeWithDefaults(this);
     }
 
     @Override
