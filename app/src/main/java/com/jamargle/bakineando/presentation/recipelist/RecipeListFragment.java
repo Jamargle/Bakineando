@@ -1,9 +1,12 @@
 package com.jamargle.bakineando.presentation.recipelist;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,7 @@ import com.jamargle.bakineando.di.ViewModelFactory;
 import com.jamargle.bakineando.domain.model.Recipe;
 import com.jamargle.bakineando.presentation.BaseFragment;
 import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Inject;
 
 public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Callback>
@@ -23,6 +27,7 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
 
     @Inject ViewModelFactory viewModelFactory;
 
+    private RecipeListAdapter adapter;
     private RecipeListViewModel recipeListViewModel;
 
     @Override
@@ -54,20 +59,31 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
         dummyRecipes.add(new Recipe.Builder().id(2).name("recipe 2").build());
 
         recipeListView.setHasFixedSize(true);
-        recipeListView.setAdapter(new RecipeListAdapter(dummyRecipes, this));
+        adapter = new RecipeListAdapter(new ArrayList<Recipe>(), this);
+        recipeListView.setAdapter(adapter);
     }
 
     private void initViewModel() {
         recipeListViewModel = ViewModelProviders.of(this, viewModelFactory).get(RecipeListViewModel.class);
+        recipeListViewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
+            @Override
+            public void onChanged(@Nullable final List<Recipe> recipes) {
+                Log.d("asdasdas", "recipes Changed:" + recipes);
+                adapter.updateRecipes(recipes);
+            }
+        });
     }
 
     @Override
     public void onRecipeClicked(final Recipe recipe) {
         //TODO Implement recipe list click callback
         Toast.makeText(getContext(), "Recipe " + recipe.getName() + " clicked", Toast.LENGTH_SHORT).show();
+        callback.onRecipeClicked(recipe);
     }
 
     interface Callback {
+
+        void onRecipeClicked(Recipe recipe);
 
     }
 
