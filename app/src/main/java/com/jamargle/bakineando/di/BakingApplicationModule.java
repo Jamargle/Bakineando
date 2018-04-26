@@ -1,5 +1,9 @@
 package com.jamargle.bakineando.di;
 
+import com.jamargle.bakineando.data.JobExecutor;
+import com.jamargle.bakineando.data.UiThread;
+import com.jamargle.bakineando.domain.interactor.PostExecutionThread;
+import com.jamargle.bakineando.domain.interactor.ThreadExecutor;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -34,6 +38,18 @@ public final class BakingApplicationModule {
     @Named(SCHEDULER_IO)
     public Scheduler provideIoScheduler() {
         return Schedulers.io();
+    }
+
+    @Provides
+    @Singleton
+    public ThreadExecutor provideThreadExecutor() {
+        return new JobExecutor();
+    }
+
+    @Provides
+    @Singleton
+    public PostExecutionThread providePostExecutionThread() {
+        return new UiThread();
     }
 
 }
