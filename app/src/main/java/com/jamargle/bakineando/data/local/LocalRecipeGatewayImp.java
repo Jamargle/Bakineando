@@ -1,10 +1,12 @@
 package com.jamargle.bakineando.data.local;
 
-import android.arch.lifecycle.LiveData;
 import com.jamargle.bakineando.data.local.dao.RecipeDao;
 import com.jamargle.bakineando.domain.model.Recipe;
 import com.jamargle.bakineando.domain.repository.LocalRecipeGateway;
 import io.reactivex.Completable;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
 import io.reactivex.functions.Action;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +18,7 @@ public final class LocalRecipeGatewayImp implements LocalRecipeGateway {
 
     private final RecipeDao recipeDao;
 
-    private long lastRefresh = -1;
+    private long lastRefresh = 0;
 
     @Inject
     public LocalRecipeGatewayImp(final RecipeDao recipeDao) {
@@ -24,23 +26,37 @@ public final class LocalRecipeGatewayImp implements LocalRecipeGateway {
     }
 
     @Override
-    public Completable persist(final List<Recipe> recipesToPersist) {
+    public Completable persistAsynchronously(final List<Recipe> recipesToPersist) {
         if (recipesToPersist == null) {
             return Completable.error(new IllegalArgumentException("The recipe cannot be null"));
         }
         return Completable.fromAction(new Action() {
             @Override
             public void run() {
-                for (final Recipe recipe : recipesToPersist) {
-                    recipeDao.addRecipe(recipe);
-                }
+                persist(recipesToPersist);
             }
         });
     }
 
     @Override
-    public LiveData<List<Recipe>> obtainRecipes() {
-        return recipeDao.getRecipes();
+    public int persistSynchronously(final List<Recipe> recipesToPersist) {
+        if (recipesToPersist == null) {
+            return -1;
+        }
+        persist(recipesToPersist);
+        return recipesToPersist.size();
+    }
+
+    @Override
+    public Single<List<Recipe>> obtainRecipes() {
+        return Single.create(new SingleOnSubscribe<List<Recipe>>() {
+
+            @Override
+            public void subscribe(final SingleEmitter<List<Recipe>> emitter) {
+                recipeDao.getRecipes().getValue();
+            }
+
+        });
     }
 
     @Override
@@ -63,7 +79,14 @@ public final class LocalRecipeGatewayImp implements LocalRecipeGateway {
             lastRefresh = currentTime;
             return true;
         } else {
-            return false;
+            return recipeDao.getRecipes().getValue() != null
+                    && recipeDao.getRecipes().getValue().isEmpty();
+        }
+    }
+
+    private void persist(List<Recipe> recipes) {
+        for (final Recipe recipe : recipes) {
+            recipeDao.addRecipe(recipe);
         }
     }
 
