@@ -5,24 +5,24 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
-import com.jamargle.bakineando.domain.model.Recipe;
+import com.jamargle.bakineando.domain.model.Ingredient;
 import java.util.List;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
 @Dao
-public interface RecipeDao {
+public interface IngredientDao {
 
-    @Query("SELECT * FROM " + Recipe.TABLE_NAME)
-    List<Recipe> getRecipes();
+    @Query("SELECT * FROM " + Ingredient.TABLE_NAME + " WHERE " + Ingredient.COLUMN_RECIPE_ID + " =:recipeId")
+    List<Ingredient> getIngredientsForRecipe(int recipeId);
 
     @Insert(onConflict = REPLACE)
-    void addRecipe(Recipe recipe);
+    void addIngredient(Ingredient ingredient);
 
     @Delete
-    void deleteRecipe(Recipe recipe);
+    void deleteIngredient(Ingredient ingredient);
 
     @Update(onConflict = REPLACE)
-    void updateRecipe(Recipe recipe);
+    void updateIngredient(Ingredient ingredient);
 
 }

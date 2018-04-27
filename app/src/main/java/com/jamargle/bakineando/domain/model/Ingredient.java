@@ -2,19 +2,37 @@ package com.jamargle.bakineando.domain.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
+import com.google.gson.annotations.SerializedName;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static com.jamargle.bakineando.domain.model.Ingredient.COLUMN_INGREDIENT;
+import static com.jamargle.bakineando.domain.model.Ingredient.COLUMN_RECIPE_ID;
 import static com.jamargle.bakineando.domain.model.Ingredient.TABLE_NAME;
 
-@Entity(tableName = TABLE_NAME)
+@Entity(
+        tableName = TABLE_NAME,
+        primaryKeys = {COLUMN_RECIPE_ID, COLUMN_INGREDIENT},
+        foreignKeys = @ForeignKey(
+                entity = Recipe.class,
+                parentColumns = Recipe.COLUMN_ID,
+                childColumns = Ingredient.COLUMN_RECIPE_ID,
+                onDelete = CASCADE
+        )
+)
 public final class Ingredient {
 
     public static final String TABLE_NAME = "Ingredients";
-    public static final String COLUMN_QUANTITY = "quantity";
-    public static final String COLUMN_MEASURE = "measure";
-    public static final String COLUMN_INGREDIENT = "ingredient";
+    public static final String COLUMN_RECIPE_ID = "recipe_id";
+    static final String COLUMN_INGREDIENT = "ingredient";
+
+    private static final String COLUMN_QUANTITY = "quantity";
+    private static final String COLUMN_MEASURE = "measure";
+
+    @ColumnInfo(index = true, name = Step.COLUMN_RECIPE_ID)
+    private int recipeId;
 
     @ColumnInfo(name = COLUMN_QUANTITY)
     private float quantity;
@@ -22,21 +40,30 @@ public final class Ingredient {
     @ColumnInfo(name = COLUMN_MEASURE)
     private String measure;
 
-    @PrimaryKey
     @NonNull
     @ColumnInfo(name = COLUMN_INGREDIENT)
-    private String ingredient;
+    @SerializedName("ingredient")
+    private String name;
 
     public Ingredient() {
-        this.ingredient = "";
+        this.name = "";
         // Needed by Room setup
     }
 
     @Ignore
     public Ingredient(final Builder builder) {
+        this.recipeId = builder.recipeId;
         this.quantity = builder.quantity;
         this.measure = builder.measure;
-        this.ingredient = builder.ingredient;
+        this.name = builder.ingredient;
+    }
+
+    public int getRecipeId() {
+        return recipeId;
+    }
+
+    public void setRecipeId(final int recipeId) {
+        this.recipeId = recipeId;
     }
 
     public float getQuantity() {
@@ -55,19 +82,26 @@ public final class Ingredient {
         this.measure = measure;
     }
 
-    public String getIngredient() {
-        return ingredient;
+    @NonNull
+    public String getName() {
+        return name;
     }
 
-    public void setIngredient(final String ingredient) {
-        this.ingredient = ingredient;
+    public void setName(@NonNull final String name) {
+        this.name = name;
     }
 
     public static class Builder {
 
+        private int recipeId;
         private float quantity;
         private String measure;
         private String ingredient;
+
+        public Builder recipeId(final int recipeId) {
+            this.recipeId = recipeId;
+            return this;
+        }
 
         public Builder quantity(final float quantity) {
             this.quantity = quantity;

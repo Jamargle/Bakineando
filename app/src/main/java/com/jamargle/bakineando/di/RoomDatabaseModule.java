@@ -3,7 +3,9 @@ package com.jamargle.bakineando.di;
 import android.arch.persistence.room.Room;
 import com.jamargle.bakineando.BakineandoApp;
 import com.jamargle.bakineando.data.local.BakingDb;
+import com.jamargle.bakineando.data.local.dao.IngredientDao;
 import com.jamargle.bakineando.data.local.dao.RecipeDao;
+import com.jamargle.bakineando.data.local.dao.StepDao;
 import dagger.Module;
 import dagger.Provides;
 import javax.inject.Singleton;
@@ -21,6 +23,18 @@ class RoomDatabaseModule {
     @Provides
     RecipeDao providesRecipesDao(BakingDb database) {
         return database.getRecipeDao();
+    }
+
+    @Singleton
+    @Provides
+    StepDao providesStepDao(BakingDb database) {
+        return database.getStepDao();
+    }
+
+    @Singleton
+    @Provides
+    IngredientDao providesIngredientDao(BakingDb database) {
+        return database.getIngredientDao();
     }
 
 }

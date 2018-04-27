@@ -2,29 +2,40 @@ package com.jamargle.bakineando.domain.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
 import com.google.gson.annotations.SerializedName;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static com.jamargle.bakineando.domain.model.Step.COLUMN_RECIPE_ID;
+import static com.jamargle.bakineando.domain.model.Step.COLUMN_STEP_NUMBER;
 import static com.jamargle.bakineando.domain.model.Step.TABLE_NAME;
 
-@Entity(tableName = TABLE_NAME)
+@Entity(
+        tableName = TABLE_NAME,
+        primaryKeys = {COLUMN_RECIPE_ID, COLUMN_STEP_NUMBER},
+        foreignKeys = @ForeignKey(
+                entity = Recipe.class,
+                parentColumns = Recipe.COLUMN_ID,
+                childColumns = COLUMN_RECIPE_ID,
+                onDelete = CASCADE
+        )
+)
 public final class Step {
 
     public static final String TABLE_NAME = "Steps";
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_STEP_NUMBER = "number";
-    public static final String COLUMN_SHORT_DESCRIPTION = "short_description";
-    public static final String COLUMN_DESCRIPTION = "description";
-    public static final String COLUMN_VIDEO_URL = "video_url";
-    public static final String COLUMN_THUMBNAIL_URL = "thumbnail_url";
+    public static final String COLUMN_RECIPE_ID = "recipe_id";
+    static final String COLUMN_STEP_NUMBER = "number";
 
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(index = true, name = COLUMN_ID)
-    private int tableId;
+    private static final String COLUMN_SHORT_DESCRIPTION = "short_description";
+    private static final String COLUMN_DESCRIPTION = "description";
+    private static final String COLUMN_VIDEO_URL = "video_url";
+    private static final String COLUMN_THUMBNAIL_URL = "thumbnail_url";
 
-    @ColumnInfo(name = COLUMN_STEP_NUMBER)
+    @ColumnInfo(index = true, name = COLUMN_RECIPE_ID)
+    private int recipeId;
 
+    @ColumnInfo(index = true, name = COLUMN_STEP_NUMBER)
     @SerializedName("id")
     private int stepNumber;
 
@@ -46,7 +57,7 @@ public final class Step {
 
     @Ignore
     public Step(final Builder builder) {
-        this.tableId = builder.tableId;
+        this.recipeId = builder.recipeId;
         this.stepNumber = builder.stepNumber;
         this.shortDescription = builder.shortDescription;
         this.description = builder.description;
@@ -54,12 +65,12 @@ public final class Step {
         this.thumbnailURL = builder.thumbnailURL;
     }
 
-    public int getTableId() {
-        return tableId;
+    public int getRecipeId() {
+        return recipeId;
     }
 
-    public void setTableId(final int tableId) {
-        this.tableId = tableId;
+    public void setRecipeId(final int recipeId) {
+        this.recipeId = recipeId;
     }
 
     public int getStepNumber() {
@@ -104,15 +115,15 @@ public final class Step {
 
     public static class Builder {
 
-        private int tableId;
+        private int recipeId;
         private int stepNumber;
         private String shortDescription;
         private String description;
         private String videoURL;
         private String thumbnailURL;
 
-        public Builder tableId(final int tableId) {
-            this.tableId = tableId;
+        public Builder recipeId(final int recipeId) {
+            this.recipeId = recipeId;
             return this;
         }
 

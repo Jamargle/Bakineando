@@ -1,12 +1,9 @@
 package com.jamargle.bakineando.domain.model;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.Relation;
-import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,11 +14,10 @@ public final class Recipe {
 
     public static final String TABLE_NAME = "Recipes";
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_SERVINGS = "servings";
-    public static final String COLUMN_IMAGE = "image";
-    public static final String COLUMN_STEPS = "fk_steps";
-    public static final String COLUMN_INGREDIENTS = "fk_ingredients";
+
+    private static final String COLUMN_NAME = "name";
+    private static final String COLUMN_SERVINGS = "servings";
+    private static final String COLUMN_IMAGE = "image";
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(index = true, name = COLUMN_ID)
@@ -51,6 +47,8 @@ public final class Recipe {
         this.name = builder.name;
         this.servings = builder.servings;
         this.image = builder.image;
+        this.steps = builder.steps;
+        this.ingredients = builder.ingredients;
     }
 
     public int getId() {
@@ -85,14 +83,20 @@ public final class Recipe {
         this.image = image;
     }
 
-    @Ignore
     public List<Step> getSteps() {
         return steps;
     }
 
-    @Ignore
+    public void setSteps(final List<Step> steps) {
+        this.steps = steps;
+    }
+
     public List<Ingredient> getIngredients() {
         return ingredients;
+    }
+
+    public void setIngredients(final List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
     }
 
     public static class Builder {
@@ -140,56 +144,6 @@ public final class Recipe {
 
         public Recipe build() {
             return new Recipe(this);
-        }
-
-    }
-
-    private static final class StepsForRecipe {
-
-        @Embedded
-        private Recipe recipeInstance;
-
-        @Relation(
-                parentColumn = COLUMN_ID,
-                entityColumn = COLUMN_STEPS,
-                entity = Step.class)
-        private List<Step> stepList;
-
-        StepsForRecipe(@NonNull final List<Step> steps) {
-            this.stepList = steps;
-        }
-
-        public List<Step> getStepList() {
-            return stepList;
-        }
-
-        public void setStepList(final List<Step> steps) {
-            this.stepList = steps;
-        }
-
-    }
-
-    private static final class IngredientsForRecipe {
-
-        @Embedded
-        private Recipe recipeInstance;
-
-        @Relation(
-                parentColumn = COLUMN_ID,
-                entityColumn = COLUMN_INGREDIENTS,
-                entity = Ingredient.class)
-        private List<Ingredient> ingredientList;
-
-        IngredientsForRecipe(@NonNull final List<Ingredient> ingredients) {
-            this.ingredientList = ingredients;
-        }
-
-        public List<Ingredient> getStepList() {
-            return ingredientList;
-        }
-
-        public void setStepList(final List<Ingredient> ingredients) {
-            this.ingredientList = ingredients;
         }
 
     }
