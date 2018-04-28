@@ -32,8 +32,6 @@ public final class RecipesRepositoryImp implements RecipesRepository {
     @Override
     public Single<List<Recipe>> getRecipes() {
         if (localRecipeGateway.isToBeRefreshed()) {
-
-
             return networkRecipeGateway.obtainRecipes()
                     .doAfterSuccess(new Consumer<List<Recipe>>() {
                         @Override
