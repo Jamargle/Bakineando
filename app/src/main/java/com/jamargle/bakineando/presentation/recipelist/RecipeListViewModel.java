@@ -3,10 +3,13 @@ package com.jamargle.bakineando.presentation.recipelist;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+
 import com.jamargle.bakineando.domain.interactor.DefaultObserver;
 import com.jamargle.bakineando.domain.interactor.FetchRecipesUseCase;
 import com.jamargle.bakineando.domain.model.Recipe;
+
 import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 

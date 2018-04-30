@@ -1,23 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:id="@+id/recipe_item_container"
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/recipe_item_container"
+    android:layout_width="match_parent"
+    android:background="?attr/selectableItemBackground"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_margin="@dimen/margin_very_small">
 
-    <TextView
-        android:id="@+id/recipe_id"
+    <ImageView
+        android:id="@+id/recipe_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem"/>
+        android:contentDescription="@string/content_description_recipe_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_restaurant" />
 
     <TextView
         android:id="@+id/recipe_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem"/>
+        android:layout_marginBottom="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="@dimen/title_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/recipe_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Nutella Pie" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/recipe_servings"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/recipe_icon"
+        app:layout_constraintTop_toBottomOf="@id/recipe_name"
+        tools:text="Servings: X" />
+
+</android.support.constraint.ConstraintLayout>

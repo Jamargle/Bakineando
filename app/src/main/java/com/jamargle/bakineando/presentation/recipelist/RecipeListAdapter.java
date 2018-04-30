@@ -6,12 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.jamargle.bakineando.R;
+import com.jamargle.bakineando.domain.model.Recipe;
+
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.jamargle.bakineando.R;
-import com.jamargle.bakineando.domain.model.Recipe;
-import java.util.List;
 
 public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.RecipeViewHolder> {
 
@@ -64,10 +67,10 @@ public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdap
 
     final class RecipeViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.recipe_id) TextView recipeId;
         @BindView(R.id.recipe_name) TextView recipeName;
+        @BindView(R.id.recipe_servings) TextView recipeServings;
 
-        RecipeViewHolder(View itemView) {
+        RecipeViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
@@ -78,8 +81,10 @@ public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdap
         }
 
         void bindRecipe(final Recipe recipe) {
-            recipeId.setText(String.valueOf(recipe.getId()));
             recipeName.setText(recipe.getName());
+            final String servingsLabel = recipeServings.getResources()
+                    .getString(R.string.servings_number, recipe.getServings());
+            recipeServings.setText(servingsLabel);
         }
     }
 
