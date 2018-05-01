@@ -6,4 +6,5 @@
     <string name="recipe_list_is_empty">There are no recipes to show</string>
     <string name="content_description_recipe_icon">This is the icon of a recipe</string>
     <string name="servings_number">Servings %1s</string>
+    <string name="recipe_introduction">Recipe Introduction</string>
 </resources>

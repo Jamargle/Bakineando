@@ -18,6 +18,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem.INGREDIENT;
+import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem.INTRODUCTION;
 import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem.STEP;
 
 public final class RecipeDetailsAdapter
@@ -41,6 +42,9 @@ public final class RecipeDetailsAdapter
 
         final LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
+            case INTRODUCTION:
+                return new IntroductionViewHolder(layoutInflater
+                        .inflate(R.layout.item_list_introduction, parent, false));
             case INGREDIENT:
                 return new IngredientViewHolder(layoutInflater
                         .inflate(R.layout.item_list_ingredient, parent, false));
@@ -57,6 +61,9 @@ public final class RecipeDetailsAdapter
             final int position) {
 
         switch (getItemViewType(position)) {
+            case INTRODUCTION:
+                ((IntroductionViewHolder) viewHolder).bindItem((IntroductionItem) dataSet.get(position));
+                break;
             case INGREDIENT:
                 ((IngredientViewHolder) viewHolder).bindItem((IngredientItem) dataSet.get(position));
                 break;
@@ -94,6 +101,21 @@ public final class RecipeDetailsAdapter
         private ViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+    }
+
+    final class IntroductionViewHolder extends ViewHolder {
+
+        @BindView(R.id.introduction_video) SimpleExoPlayerView videoView;
+
+        IntroductionViewHolder(final View itemView) {
+            super(itemView);
+        }
+
+        void bindItem(@NonNull final IntroductionItem item) {
+            final Step introductionStep = item.getItem();
+            if (!introductionStep.getVideoURL().isEmpty()) {
+            }
         }
     }
 
