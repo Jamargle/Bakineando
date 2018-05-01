@@ -17,10 +17,12 @@ public abstract class BaseFragment<C> extends Fragment {
 
     protected C callback;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "deprecation"})
     @Override
     public void onAttach(final Activity activity) {
-        AndroidSupportInjection.inject(this);
+        if (((BaseActivity) activity).supportFragmentInjector() != null) {
+            AndroidSupportInjection.inject(this);
+        }
         super.onAttach(activity);
         try {
             callback = (C) activity;
