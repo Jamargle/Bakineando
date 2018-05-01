@@ -29,6 +29,8 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
+
+    private static final String RECIPE_TO_SHOW = "key:RecipeDetailFragment_recipe_to_show";
     public RecipeDetailFragment() {
     }
 
@@ -48,6 +50,12 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
                 appBarLayout.setTitle(mItem.content);
             }
         }
+    public static RecipeDetailFragment newInstance(@NonNull final Recipe recipe) {
+        final Bundle args = new Bundle();
+        args.putParcelable(RECIPE_TO_SHOW, recipe);
+        final RecipeDetailFragment fragment = new RecipeDetailFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override

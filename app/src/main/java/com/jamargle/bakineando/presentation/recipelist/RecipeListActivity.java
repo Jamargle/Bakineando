@@ -43,7 +43,8 @@ public final class RecipeListActivity extends BaseActivity
                     .replace(R.id.recipe_detail_container, new RecipeDetailFragment())
                     .commit();
         } else {
-            startActivity(new Intent(this, RecipeDetailActivity.class));
+            final Intent intent = new Intent(this, RecipeDetailActivity.class);
+            startActivity(intent.putExtras(RecipeDetailActivity.newBundle(recipe)));
         }
     }
 
