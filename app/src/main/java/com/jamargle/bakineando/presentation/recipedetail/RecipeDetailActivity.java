@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.domain.model.Recipe;
+import com.jamargle.bakineando.domain.model.Step;
 import com.jamargle.bakineando.presentation.BaseActivity;
 import com.jamargle.bakineando.presentation.recipelist.RecipeListActivity;
 
@@ -53,6 +55,12 @@ public final class RecipeDetailActivity extends BaseActivity
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    public void onStepClicked(Step step) {
+        // TODO Implement step clicked callback
+        Toast.makeText(this, "Step clicked " + step.getStepNumber(), Toast.LENGTH_SHORT).show();
     }
 
 }
