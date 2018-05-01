@@ -4,6 +4,9 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -21,7 +24,7 @@ import static com.jamargle.bakineando.domain.model.Step.TABLE_NAME;
                 onDelete = CASCADE
         )
 )
-public final class Step {
+public final class Step implements Parcelable {
 
     public static final String TABLE_NAME = "Steps";
     public static final String COLUMN_RECIPE_ID = "recipe_id";
@@ -111,6 +114,45 @@ public final class Step {
 
     public void setThumbnailURL(final String thumbnailURL) {
         this.thumbnailURL = thumbnailURL;
+    }
+
+    public static final Creator<Step> CREATOR = new Creator<Step>() {
+        @Override
+        public Step createFromParcel(final Parcel in) {
+            return new Step(in);
+        }
+
+        @Override
+        public Step[] newArray(final int size) {
+            return new Step[size];
+        }
+    };
+
+    protected Step(final Parcel in) {
+        recipeId = in.readInt();
+        stepNumber = in.readInt();
+        shortDescription = in.readString();
+        description = in.readString();
+        videoURL = in.readString();
+        thumbnailURL = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(
+            final Parcel dest,
+            final int flags) {
+
+        dest.writeInt(recipeId);
+        dest.writeInt(stepNumber);
+        dest.writeString(shortDescription);
+        dest.writeString(description);
+        dest.writeString(videoURL);
+        dest.writeString(thumbnailURL);
     }
 
     public static class Builder {

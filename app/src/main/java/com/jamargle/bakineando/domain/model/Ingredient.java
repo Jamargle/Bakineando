@@ -4,7 +4,10 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -22,7 +25,7 @@ import static com.jamargle.bakineando.domain.model.Ingredient.TABLE_NAME;
                 onDelete = CASCADE
         )
 )
-public final class Ingredient {
+public final class Ingredient implements Parcelable {
 
     public static final String TABLE_NAME = "Ingredients";
     public static final String COLUMN_RECIPE_ID = "recipe_id";
@@ -89,6 +92,41 @@ public final class Ingredient {
 
     public void setName(@NonNull final String name) {
         this.name = name;
+    }
+
+    public static final Creator<Ingredient> CREATOR = new Creator<Ingredient>() {
+        @Override
+        public Ingredient createFromParcel(final Parcel in) {
+            return new Ingredient(in);
+        }
+
+        @Override
+        public Ingredient[] newArray(final int size) {
+            return new Ingredient[size];
+        }
+    };
+
+    protected Ingredient(final Parcel in) {
+        recipeId = in.readInt();
+        quantity = in.readFloat();
+        measure = in.readString();
+        name = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(
+            final Parcel dest,
+            final int flags) {
+
+        dest.writeInt(recipeId);
+        dest.writeFloat(quantity);
+        dest.writeString(measure);
+        dest.writeString(name);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static class Builder {

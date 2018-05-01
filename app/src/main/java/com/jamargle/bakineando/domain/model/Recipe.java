@@ -4,13 +4,16 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.jamargle.bakineando.domain.model.Recipe.TABLE_NAME;
 
 @Entity(tableName = TABLE_NAME)
-public final class Recipe {
+public final class Recipe implements Parcelable {
 
     public static final String TABLE_NAME = "Recipes";
     public static final String COLUMN_ID = "id";
@@ -33,9 +36,9 @@ public final class Recipe {
     private String image;
 
     @Ignore
-    private List<Step> steps;
+    private List<Step> steps = new ArrayList<>();
     @Ignore
-    private List<Ingredient> ingredients;
+    private List<Ingredient> ingredients = new ArrayList<>();
 
     public Recipe() {
         // Needed by Room setup
@@ -97,6 +100,45 @@ public final class Recipe {
 
     public void setIngredients(final List<Ingredient> ingredients) {
         this.ingredients = ingredients;
+    }
+
+    public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
+        @Override
+        public Recipe createFromParcel(final Parcel in) {
+            return new Recipe(in);
+        }
+
+        @Override
+        public Recipe[] newArray(final int size) {
+            return new Recipe[size];
+        }
+    };
+
+    protected Recipe(final Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        servings = in.readInt();
+        image = in.readString();
+        in.readTypedList(this.steps, Step.CREATOR);
+        in.readTypedList(this.ingredients, Ingredient.CREATOR);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(
+            final Parcel dest,
+            final int flags) {
+
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeInt(servings);
+        dest.writeString(image);
+        dest.writeTypedList(steps);
+        dest.writeTypedList(ingredients);
     }
 
     public static class Builder {
