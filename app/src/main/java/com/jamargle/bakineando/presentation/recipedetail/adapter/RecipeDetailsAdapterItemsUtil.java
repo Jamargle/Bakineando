@@ -1,17 +1,24 @@
 package com.jamargle.bakineando.presentation.recipedetail.adapter;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
-
+import android.util.SparseIntArray;
+import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.domain.model.Ingredient;
 import com.jamargle.bakineando.domain.model.Recipe;
 import com.jamargle.bakineando.domain.model.Step;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem.INGREDIENT;
+import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem.INTRODUCTION;
+import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem.STEP;
 
 public final class RecipeDetailsAdapterItemsUtil {
 
     private static final String INTRODUCTION_TEXT = "Recipe Introduction";
+
+    private static SparseIntArray headerMapper;
 
     private RecipeDetailsAdapterItemsUtil() {
     }
@@ -44,6 +51,28 @@ public final class RecipeDetailsAdapterItemsUtil {
         }
 
         return items;
+    }
+
+    public static List<String> getRecipeDetailsHeaders(@NonNull final Context context) {
+        headerMapper = new SparseIntArray(3);
+        final List<String> headers = new ArrayList<>(3);
+
+        headers.add(context.getString(R.string.recipe_introduction_list_header));
+        headerMapper.put(INTRODUCTION, 0);
+
+        headers.add(context.getString(R.string.ingredients_list_header));
+        headerMapper.put(INGREDIENT, 1);
+
+        headers.add(context.getString(R.string.steps_list_header));
+        headerMapper.put(STEP, 2);
+        return headers;
+    }
+
+    public static int getRecipeDetailHeaderIndex(final int viewType) {
+        if (headerMapper != null) {
+            return headerMapper.get(viewType);
+        }
+        return -1;
     }
 
 }
