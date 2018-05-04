@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/ingredient_background"
     android:paddingBottom="@dimen/margin_small"
     android:paddingEnd="@dimen/margin_very_small"
     android:paddingStart="@dimen/margin_very_small"
@@ -29,7 +28,9 @@
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/introduction_video"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="@dimen/introduction_video_height"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
         app:layout_constraintTop_toBottomOf="@id/introduction_label"/>
 
 </android.support.constraint.ConstraintLayout>
