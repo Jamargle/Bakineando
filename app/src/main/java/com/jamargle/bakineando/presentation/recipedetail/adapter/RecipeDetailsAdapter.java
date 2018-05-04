@@ -21,7 +21,7 @@ import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeIt
 import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem.STEP;
 
 public final class RecipeDetailsAdapter
-        extends RecyclerView.Adapter<RecipeDetailsAdapter.ViewHolder> {
+        extends RecyclerView.Adapter<RecipeDetailsAdapter.BaseViewHolder> {
 
     private final List<RecipeItem> dataSet;
     private final OnStepClickListener listener;
@@ -38,7 +38,7 @@ public final class RecipeDetailsAdapter
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(
+    public BaseViewHolder onCreateViewHolder(
             @NonNull final ViewGroup parent,
             final int viewType) {
 
@@ -58,7 +58,7 @@ public final class RecipeDetailsAdapter
     }
 
     @Override
-    public void onViewDetachedFromWindow(@NonNull final ViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull final BaseViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
         if (holder instanceof IntroductionViewHolder) {
             videoListener.onVideoViewToBeStopped();
@@ -67,7 +67,7 @@ public final class RecipeDetailsAdapter
 
     @Override
     public void onBindViewHolder(
-            @NonNull final ViewHolder viewHolder,
+            @NonNull final BaseViewHolder viewHolder,
             final int position) {
 
         switch (getItemViewType(position)) {
@@ -117,15 +117,15 @@ public final class RecipeDetailsAdapter
 
     }
 
-    abstract class ViewHolder extends RecyclerView.ViewHolder {
+    abstract class BaseViewHolder extends RecyclerView.ViewHolder {
 
-        private ViewHolder(final View itemView) {
+        private BaseViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
     }
 
-    final class IntroductionViewHolder extends ViewHolder {
+    final class IntroductionViewHolder extends BaseViewHolder {
 
         @BindView(R.id.introduction_video) PlayerView videoView;
 
@@ -142,7 +142,7 @@ public final class RecipeDetailsAdapter
 
     }
 
-    final class IngredientViewHolder extends ViewHolder {
+    final class IngredientViewHolder extends BaseViewHolder {
 
         @BindView(R.id.ingredient_name) TextView ingredientName;
         @BindView(R.id.ingredient_quantity) TextView ingredientQuantity;
@@ -159,7 +159,7 @@ public final class RecipeDetailsAdapter
         }
     }
 
-    final class StepViewHolder extends ViewHolder {
+    final class StepViewHolder extends BaseViewHolder {
 
         @BindView(R.id.short_description) TextView shortDescription;
 
