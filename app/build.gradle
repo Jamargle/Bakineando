@@ -67,6 +67,10 @@ dependencies {
     // Stetho
     implementation "com.facebook.stetho:stetho:1.5.0"
 
+    // Exoplayer
+    implementation "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-ui:$exoPlayerVersion"
+
     testImplementation "junit:junit:$rootProject.ext.junitVersion"
     testImplementation "org.mockito:mockito-core:$rootProject.mockitoVersion"
     androidTestImplementation "com.android.support.test:runner:$rootProject.runnerVersion"

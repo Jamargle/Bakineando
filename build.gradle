@@ -46,6 +46,8 @@ ext {
     archLifecycleVersion = '1.1.1'
     // Dagger2
     dagger2Version = '2.14.1'
+    // Exoplayer
+    exoPlayerVersion = '2.7.3'
 
     junitVersion = '4.12'
     runnerVersion = '1.0.1'
