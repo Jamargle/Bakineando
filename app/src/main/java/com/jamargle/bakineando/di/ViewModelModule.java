@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProvider;
 
 import com.jamargle.bakineando.presentation.recipedetail.RecipeDetailViewModel;
 import com.jamargle.bakineando.presentation.recipelist.RecipeListViewModel;
+import com.jamargle.bakineando.presentation.stepdetail.StepDetailViewModel;
 
 import dagger.Binds;
 import dagger.Module;
@@ -25,5 +26,10 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(RecipeDetailViewModel.class)
     abstract ViewModel bindRecipeDetailViewModel(RecipeDetailViewModel recipeDetailViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(StepDetailViewModel.class)
+    abstract ViewModel bindStepDetailViewModel(StepDetailViewModel stepDetailViewModel);
 
 }
