@@ -17,9 +17,9 @@
             android:name=".presentation.recipelist.RecipeListActivity"
             android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
@@ -28,7 +28,15 @@
             android:parentActivityName=".presentation.recipelist.RecipeListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.jamargle.bakineando.presentation.recipelist.RecipeListActivity" />
+                android:value="com.jamargle.bakineando.presentation.recipelist.RecipeListActivity"/>
+        </activity>
+        <activity
+            android:name=".presentation.stepdetail.StepDetailActivity"
+            android:label="@string/title_step_detail"
+            android:parentActivityName=".presentation.recipedetail.RecipeDetailActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jamargle.bakineando.presentation.recipedetail.RecipeDetailActivity"/>
         </activity>
     </application>
 
