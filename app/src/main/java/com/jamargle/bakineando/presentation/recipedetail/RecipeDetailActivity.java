@@ -54,6 +54,8 @@ public final class RecipeDetailActivity extends BaseActivity
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            final Recipe recipe = getIntent().getParcelableExtra(RECIPE_TO_SHOW);
+            actionBar.setTitle(recipe.getName().trim());
         }
     }
 
