@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.domain.model.Recipe;
@@ -12,7 +11,7 @@ import com.jamargle.bakineando.domain.model.Step;
 import com.jamargle.bakineando.presentation.BaseActivity;
 import com.jamargle.bakineando.presentation.recipelist.RecipeListActivity;
 
-import butterknife.ButterKnife;
+import com.jamargle.bakineando.presentation.stepdetail.StepDetailActivity;
 
 public final class RecipeDetailActivity extends BaseActivity
         implements RecipeDetailFragment.Callback {
@@ -29,7 +28,6 @@ public final class RecipeDetailActivity extends BaseActivity
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
-        ButterKnife.bind(this);
         initToolbar();
 
         if (savedInstanceState == null) {
@@ -60,9 +58,9 @@ public final class RecipeDetailActivity extends BaseActivity
     }
 
     @Override
-    public void onStepClicked(Step step) {
-        // TODO Implement step clicked callback
-        Toast.makeText(this, "Step clicked " + step.getStepNumber(), Toast.LENGTH_SHORT).show();
+    public void onStepClicked(final Step step) {
+        final Intent intent = new Intent(this, StepDetailActivity.class);
+        startActivity(intent.putExtras(StepDetailActivity.newBundle(step)));
     }
 
 }

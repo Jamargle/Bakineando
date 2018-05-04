@@ -1,13 +1,11 @@
 package com.jamargle.bakineando.presentation.stepdetail;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.domain.model.Step;
 import com.jamargle.bakineando.presentation.BaseActivity;
-import com.jamargle.bakineando.presentation.recipelist.RecipeListActivity;
 
 public final class StepDetailActivity extends BaseActivity
         implements StepDetailFragment.Callback {
@@ -38,7 +36,7 @@ public final class StepDetailActivity extends BaseActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            navigateUpTo(new Intent(this, RecipeListActivity.class));
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
