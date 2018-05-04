@@ -17,4 +17,8 @@ public abstract class RecipeItem<T> {
         return item;
     }
 
+    public int getHeaderPosition() {
+        return RecipeDetailsAdapterItemsUtil.getRecipeDetailHeaderIndex(viewType);
+    }
+
 }

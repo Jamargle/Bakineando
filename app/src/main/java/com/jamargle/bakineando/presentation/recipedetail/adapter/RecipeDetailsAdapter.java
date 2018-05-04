@@ -1,7 +1,9 @@
 package com.jamargle.bakineando.presentation.recipedetail.adapter;
 
 import android.net.Uri;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.domain.model.Ingredient;
 import com.jamargle.bakineando.domain.model.Step;
+import com.jamargle.bakineando.util.stickyheader.StickyHeaderAdapter;
 import java.util.List;
 
 import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem.INGREDIENT;
@@ -21,18 +24,22 @@ import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeIt
 import static com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem.STEP;
 
 public final class RecipeDetailsAdapter
-        extends RecyclerView.Adapter<RecipeDetailsAdapter.BaseViewHolder> {
+        extends RecyclerView.Adapter<RecipeDetailsAdapter.BaseViewHolder>
+        implements StickyHeaderAdapter<RecipeDetailsAdapter.HeaderViewHolder> {
 
     private final List<RecipeItem> dataSet;
+    private final List<String> headers;
     private final OnStepClickListener listener;
     private final VideoItemListener videoListener;
 
     public RecipeDetailsAdapter(
             @NonNull final List<RecipeItem> dataSet,
+            @NonNull final List<String> headers,
             @NonNull final OnStepClickListener listener,
             @NonNull final VideoItemListener videoListener) {
 
         this.dataSet = dataSet;
+        this.headers = headers;
         this.listener = listener;
         this.videoListener = videoListener;
     }
@@ -94,6 +101,25 @@ public final class RecipeDetailsAdapter
         return dataSet.get(position).getViewType();
     }
 
+    @Override
+    public long getHeaderId(final int position) {
+        return dataSet.get(position).getHeaderPosition();
+    }
+
+    @Override
+    public HeaderViewHolder onCreateHeaderViewHolder(final ViewGroup parent) {
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        return new HeaderViewHolder(inflater.inflate(R.layout.item_list_recipe_detail_header, parent, false));
+    }
+
+    @Override
+    public void onBindHeaderViewHolder(
+            final HeaderViewHolder viewHolder,
+            final int position) {
+
+        viewHolder.bindHeader(dataSet.get(position).viewType, headers.get((int) getHeaderId(position)));
+    }
+
     public void updateRecipeItemList(final List<RecipeItem> newDataSet) {
         dataSet.clear();
         dataSet.addAll(newDataSet);
@@ -119,10 +145,42 @@ public final class RecipeDetailsAdapter
 
     abstract class BaseViewHolder extends RecyclerView.ViewHolder {
 
-        private BaseViewHolder(final View itemView) {
+        BaseViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+    }
+
+    class HeaderViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.recipe_detail_header) TextView headerText;
+
+        HeaderViewHolder(final View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
+
+        void bindHeader(
+                final int viewType,
+                final String text) {
+
+            headerText.setText(text);
+            @ColorRes final int colorToApply;
+            switch (viewType) {
+                case INTRODUCTION:
+                    colorToApply = android.R.color.white;
+                    break;
+                case INGREDIENT:
+                    colorToApply = R.color.ingredient_header_background;
+                    break;
+                case STEP:
+                default:
+                    colorToApply = R.color.step_header_background;
+                    break;
+            }
+            headerText.setBackgroundColor(ContextCompat.getColor(headerText.getContext(), colorToApply));
+        }
+
     }
 
     final class IntroductionViewHolder extends BaseViewHolder {

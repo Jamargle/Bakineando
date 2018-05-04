@@ -3,6 +3,8 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="ingredient_header_background">#5F72D9</color>
     <color name="ingredient_background">#203F51B5</color>
     <color name="step_background">#20FF4081</color>
+    <color name="step_header_background">#F98BA5</color>
 </resources>

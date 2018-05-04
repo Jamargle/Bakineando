@@ -2,7 +2,6 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="@dimen/margin_small"
@@ -10,27 +9,14 @@
     android:paddingStart="@dimen/margin_very_small"
     android:paddingTop="@dimen/margin_small">
 
-    <TextView
-        android:id="@+id/introduction_label"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/margin_normal"
-        android:layout_marginStart="@dimen/margin_normal"
-        android:text="@string/recipe_introduction"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="@dimen/title_normal"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Graham Cracker crumbs"/>
-
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/introduction_video"
         android:layout_width="match_parent"
         android:layout_height="@dimen/introduction_video_height"
         android:layout_marginEnd="@dimen/margin_normal"
         android:layout_marginStart="@dimen/margin_normal"
-        app:layout_constraintTop_toBottomOf="@id/introduction_label"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

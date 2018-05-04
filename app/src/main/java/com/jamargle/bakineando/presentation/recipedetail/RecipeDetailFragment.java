@@ -34,6 +34,7 @@ import com.jamargle.bakineando.presentation.BaseFragment;
 import com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeDetailsAdapter;
 import com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeDetailsAdapterItemsUtil;
 import com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem;
+import com.jamargle.bakineando.util.stickyheader.StickyHeaderDecoration;
 import java.util.ArrayList;
 import javax.inject.Inject;
 
@@ -70,7 +71,7 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
             final Bundle savedInstanceState) {
 
         final View view = super.onCreateView(inflater, container, savedInstanceState);
-        initRecyclerView();
+        initRecyclerView(container.getContext());
         initViewModel();
         return view;
     }
@@ -146,9 +147,15 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
         }
     }
 
-    private void initRecyclerView() {
-        adapter = new RecipeDetailsAdapter(new ArrayList<RecipeItem>(), this, this);
+    private void initRecyclerView(final Context context) {
+        adapter = new RecipeDetailsAdapter(
+                new ArrayList<RecipeItem>(),
+                RecipeDetailsAdapterItemsUtil.getRecipeDetailsHeaders(context),
+                this, this);
         recipeStuffList.setAdapter(adapter);
+
+        final StickyHeaderDecoration stickyHeaderDecoration = new StickyHeaderDecoration(adapter);
+        recipeStuffList.addItemDecoration(stickyHeaderDecoration, 0);
     }
 
     private void initViewModel() {
