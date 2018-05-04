@@ -37,7 +37,7 @@ public final class RecipeDetailsAdapterItemsUtil {
                 recipe.getIngredients().size() +
                         recipe.getSteps().size());
 
-        final List<Step> steps = recipe.getSteps();
+        final List<Step> steps = new ArrayList<>(recipe.getSteps());
         if (INTRODUCTION_TEXT.equals(steps.get(0).getShortDescription())) {
             final Step introduction = steps.remove(0);
             items.add(new IntroductionItem(introduction));
