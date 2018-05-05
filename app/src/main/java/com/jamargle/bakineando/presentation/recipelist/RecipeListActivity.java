@@ -47,9 +47,8 @@ public final class RecipeListActivity extends BaseActivity
 
     private void showNewRecipeDetailsFragment(final Recipe recipe) {
         if (isTwoPane) {
-            // TODO Set up the recipe detail fragment
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.recipe_detail_container, new RecipeDetailFragment())
+                    .replace(R.id.recipe_detail_container, RecipeDetailFragment.newInstance(recipe))
                     .commit();
         } else {
             final Intent intent = new Intent(this, RecipeDetailActivity.class);
