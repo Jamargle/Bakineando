@@ -71,7 +71,9 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
     public void onSaveInstanceState(final Bundle outState) {
         final int position = ((LinearLayoutManager) recipeListView.getLayoutManager()).findLastVisibleItemPosition();
         outState.putInt(SAVED_SCROLL_POSITION, position);
-        outState.putInt(SAVED_SELECTED_POSITION, adapter.getSelectedPosition());
+        if (adapter.getSelectedPosition() >= 0) {
+            outState.putInt(SAVED_SELECTED_POSITION, adapter.getSelectedPosition());
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -114,8 +116,11 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                final LinearLayoutManager layoutManager = (LinearLayoutManager) recipeListView.getLayoutManager();
-                layoutManager.smoothScrollToPosition(recipeListView, null, position);
+                if (RecyclerView.NO_POSITION != position) {
+                    final LinearLayoutManager layoutManager =
+                            (LinearLayoutManager) recipeListView.getLayoutManager();
+                    layoutManager.smoothScrollToPosition(recipeListView, null, position);
+                }
             }
         }, delay);
     }

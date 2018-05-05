@@ -5,14 +5,17 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -47,6 +50,8 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
         RecipeDetailsAdapter.VideoItemListener {
 
     private static final String RECIPE_TO_SHOW = "key:RecipeDetailFragment_recipe_to_show";
+    private static final String SAVED_SCROLL_POSITION = "key:RecipeDetailFragment_scroll_position";
+    private static final String SAVED_VIDEO_ENDED = "key:RecipeDetailFragment_video_ended";
 
     @BindView(R.id.recipe_stuff_list) RecyclerView recipeStuffList;
 
@@ -56,6 +61,7 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
     private RecipeDetailViewModel recipeDetailsViewModel;
     private SimpleExoPlayer player = null;
     private Uri videoUri = null;
+    private boolean isVideoEnded = false;
 
     public RecipeDetailFragment() {
     }
@@ -83,9 +89,33 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
     }
 
     @Override
+    public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(SAVED_SCROLL_POSITION)) {
+                final int position = savedInstanceState.getInt(SAVED_SCROLL_POSITION);
+                scrollToSavedScrollPosition(position);
+            }
+            if (savedInstanceState.containsKey(SAVED_VIDEO_ENDED)) {
+                isVideoEnded = savedInstanceState.getBoolean(SAVED_VIDEO_ENDED);
+            }
+        }
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        final int position = ((LinearLayoutManager) recipeStuffList.getLayoutManager()).findLastVisibleItemPosition();
+        if (position >= 0) {
+            outState.putInt(SAVED_SCROLL_POSITION, position);
+        }
+        outState.putBoolean(SAVED_VIDEO_ENDED, isVideoEnded);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        if (videoUri != null) {
+        if (!isVideoEnded && videoUri != null) {
             final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
             if (player == null) {
                 player = initPlayer(bandwidthMeter);
@@ -185,6 +215,21 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
         }
     }
 
+    private void scrollToSavedScrollPosition(final int position) {
+        final Handler handler = new Handler();
+        final int delay = 200;  // Add some delay to perform the scroll after the view is initialized
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (RecyclerView.NO_POSITION != position) {
+                    final LinearLayoutManager layoutManager =
+                            (LinearLayoutManager) recipeStuffList.getLayoutManager();
+                    layoutManager.smoothScrollToPosition(recipeStuffList, null, position);
+                }
+            }
+        }, delay);
+    }
+
     @Nullable
     private SimpleExoPlayer initPlayer(final DefaultBandwidthMeter bandwidthMeter) {
         final Context context = getActivity();
@@ -193,7 +238,25 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
         }
         final TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
         final TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-        return ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+        final SimpleExoPlayer simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+        simpleExoPlayer.addListener(new Player.DefaultEventListener() {
+
+            @Override
+            public void onPlayerStateChanged(
+                    final boolean playWhenReady,
+                    final int playbackState) {
+
+                switch (playbackState) {
+                    case Player.STATE_ENDED:
+                        isVideoEnded = true;
+                        break;
+                    default:
+                        // Do nothing
+                }
+            }
+
+        });
+        return simpleExoPlayer;
     }
 
     private MediaSource getVideoSource(
