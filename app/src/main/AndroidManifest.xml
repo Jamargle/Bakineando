@@ -38,6 +38,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jamargle.bakineando.presentation.recipedetail.RecipeDetailActivity"/>
         </activity>
+        <activity android:name=".presentation.widgetconfiguration.BakingWidgetConfigureActivity">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".widget.BakingWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/baking_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

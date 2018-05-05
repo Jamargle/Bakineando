@@ -13,4 +13,7 @@
 
     <color name="step_background">#20FF4081</color>
     <color name="step_header_background">#F98BA5</color>
+
+    <color name="widget_background">#008bcc</color>
+    <color name="widget_text">@android:color/white</color>
 </resources>

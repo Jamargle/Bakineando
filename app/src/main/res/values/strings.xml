@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Bakineando</string>
     <string name="title_recipe_detail">Recipe Detail</string>
     <string name="title_step_detail">Step Details</string>
@@ -14,4 +14,14 @@
 
     <string name="step_number">Step %1s</string>
     <string name="content_description_step_image">This is the image of this step</string>
+
+    <!-- Widget Configuration-->
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="select_recipe">Select a recipe:</string>
+    <string name="ok">OK</string>
+
+    <string name="recipe_details_ingredient_line" translatable="false">
+    <xliff:g id="bullet">\u2022</xliff:g> <xliff:g id="name">%s</xliff:g>
+    (<xliff:g id="quantity">%s</xliff:g> <xliff:g id="measure">%s</xliff:g>)
+  </string>
 </resources>
