@@ -3,8 +3,10 @@ package com.jamargle.bakineando.presentation.recipelist;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +27,8 @@ import butterknife.BindView;
 public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Callback>
         implements RecipeListAdapter.OnRecipeClickListener {
 
+    private static final String SAVED_SCROLL_POSITION = "key:RecipeListFragment_scroll_position";
+
     @BindView(R.id.recipes_recycler_view) RecyclerView recipeListView;
 
     @Inject ViewModelFactory viewModelFactory;
@@ -42,6 +46,21 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
         initRecyclerView();
         initViewModel();
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(SAVED_SCROLL_POSITION)) {
+            scrollToSavedScrollPosition(savedInstanceState);
+        }
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        final int position = ((LinearLayoutManager) recipeListView.getLayoutManager()).findLastVisibleItemPosition();
+        outState.putInt(SAVED_SCROLL_POSITION, position);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -75,6 +94,19 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
     @Override
     public void onRecipeClicked(final Recipe recipe) {
         callback.onRecipeClicked(recipe);
+    }
+
+    private void scrollToSavedScrollPosition(final Bundle savedInstanceState) {
+        final Handler handler = new Handler();
+        final int delay = 200;  // Add some delay to perform the scroll after the view is initialized
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final int position = savedInstanceState.getInt(SAVED_SCROLL_POSITION);
+                final LinearLayoutManager layoutManager = (LinearLayoutManager) recipeListView.getLayoutManager();
+                layoutManager.smoothScrollToPosition(recipeListView, null, position);
+            }
+        }, delay);
     }
 
     interface Callback {
