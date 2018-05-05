@@ -11,7 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import butterknife.BindView;
+
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -35,8 +35,12 @@ import com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeDetailsAd
 import com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeDetailsAdapterItemsUtil;
 import com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem;
 import com.jamargle.bakineando.util.stickyheader.StickyHeaderDecoration;
+
 import java.util.ArrayList;
+
 import javax.inject.Inject;
+
+import butterknife.BindView;
 
 public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragment.Callback>
         implements RecipeDetailsAdapter.OnStepClickListener,
@@ -71,8 +75,10 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
             final Bundle savedInstanceState) {
 
         final View view = super.onCreateView(inflater, container, savedInstanceState);
-        initRecyclerView(container.getContext());
-        initViewModel();
+        if (container != null) {
+            initRecyclerView(container.getContext());
+            initViewModel();
+        }
         return view;
     }
 
@@ -109,7 +115,10 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
 
     @Override
     protected boolean isToBeRetained() {
-        return true;
+        // If we retain the instance of this fragment, during a configurationChange android tries to
+        // put it in the same view (and for tablets layout it may be not possible) so do not retain
+        // this fragment
+        return false;
     }
 
     @Override
