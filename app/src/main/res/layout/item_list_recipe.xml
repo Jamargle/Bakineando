@@ -6,9 +6,9 @@
     android:id="@+id/recipe_item_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/margin_very_small"
     android:background="@drawable/recipe_item_selector"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    android:padding="@dimen/margin_normal">
 
     <ImageView
         android:id="@+id/recipe_icon"
