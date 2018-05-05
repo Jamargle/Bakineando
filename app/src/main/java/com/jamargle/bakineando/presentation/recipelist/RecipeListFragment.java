@@ -28,6 +28,7 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
         implements RecipeListAdapter.OnRecipeClickListener {
 
     private static final String SAVED_SCROLL_POSITION = "key:RecipeListFragment_scroll_position";
+    private static final String SAVED_SELECTED_POSITION = "key:RecipeListFragment_selected_position";
 
     @BindView(R.id.recipes_recycler_view) RecyclerView recipeListView;
 
@@ -50,8 +51,18 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
 
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
-        if (savedInstanceState != null && savedInstanceState.containsKey(SAVED_SCROLL_POSITION)) {
-            scrollToSavedScrollPosition(savedInstanceState);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(SAVED_SCROLL_POSITION)
+                    && !savedInstanceState.containsKey(SAVED_SELECTED_POSITION)) {
+
+                final int position = savedInstanceState.getInt(SAVED_SCROLL_POSITION);
+                scrollToSavedScrollPosition(position);
+            }
+            if (savedInstanceState.containsKey(SAVED_SELECTED_POSITION)) {
+                final int position = savedInstanceState.getInt(SAVED_SELECTED_POSITION);
+                adapter.setSelectedPosition(position);
+                scrollToSavedScrollPosition(position);
+            }
         }
         super.onActivityCreated(savedInstanceState);
     }
@@ -60,6 +71,7 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
     public void onSaveInstanceState(final Bundle outState) {
         final int position = ((LinearLayoutManager) recipeListView.getLayoutManager()).findLastVisibleItemPosition();
         outState.putInt(SAVED_SCROLL_POSITION, position);
+        outState.putInt(SAVED_SELECTED_POSITION, adapter.getSelectedPosition());
         super.onSaveInstanceState(outState);
     }
 
@@ -96,13 +108,12 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
         callback.onRecipeClicked(recipe);
     }
 
-    private void scrollToSavedScrollPosition(final Bundle savedInstanceState) {
+    private void scrollToSavedScrollPosition(final int position) {
         final Handler handler = new Handler();
         final int delay = 200;  // Add some delay to perform the scroll after the view is initialized
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                final int position = savedInstanceState.getInt(SAVED_SCROLL_POSITION);
                 final LinearLayoutManager layoutManager = (LinearLayoutManager) recipeListView.getLayoutManager();
                 layoutManager.smoothScrollToPosition(recipeListView, null, position);
             }

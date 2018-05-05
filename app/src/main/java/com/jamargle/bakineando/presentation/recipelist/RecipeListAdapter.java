@@ -64,6 +64,13 @@ public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdap
         return selectedPosition;
     }
 
+    public void setSelectedPosition(final int selectedPosition) {
+        final int previousSelected = this.selectedPosition;
+        this.selectedPosition = selectedPosition;
+        notifyItemChanged(previousSelected);
+        notifyItemChanged(selectedPosition);
+    }
+
     public interface OnRecipeClickListener {
 
         void onRecipeClicked(Recipe recipe);
@@ -85,10 +92,7 @@ public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdap
             final int currentPosition = getAdapterPosition();
             listener.onRecipeClicked(recipeDataset.get(currentPosition));
 
-            final int previousSelectedPosition = selectedPosition;
-            notifyItemChanged(previousSelectedPosition);
-            selectedPosition = currentPosition;
-            notifyItemChanged(selectedPosition);
+            setSelectedPosition(currentPosition);
         }
 
         void bindRecipe(final Recipe recipe) {
