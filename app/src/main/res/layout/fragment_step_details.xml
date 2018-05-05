@@ -1,37 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".presentation.stepdetail.StepDetailActivity">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/short_description"
+    <android.support.constraint.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_normal"
-        android:textSize="@dimen/title_normal"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Melt butter and bittersweet chocolate."/>
+        tools:context=".presentation.stepdetail.StepDetailActivity">
 
-    <com.google.android.exoplayer2.ui.PlayerView
-        android:id="@+id/step_video"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/introduction_video_height"
-        android:layout_margin="@dimen/margin_normal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/short_description"/>
+        <TextView
+            android:id="@+id/short_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_normal"
+            android:textSize="@dimen/title_normal"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Melt butter and bittersweet chocolate." />
 
-    <TextView
-        android:id="@+id/full_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_normal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintTop_toBottomOf="@id/step_video"
-        tools:text="2. Melt the butter and bittersweet chocolate together in a microwave or a double boiler. If microwaving, heat for 30 seconds at a time, removing bowl and stirring ingredients in between."/>
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/step_video"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/introduction_video_height"
+            android:layout_margin="@dimen/margin_normal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/short_description" />
 
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/full_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_normal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintTop_toBottomOf="@id/step_video"
+            tools:text="2. Melt the butter and bittersweet chocolate together in a microwave or a double boiler. If microwaving, heat for 30 seconds at a time, removing bowl and stirring ingredients in between." />
+
+    </android.support.constraint.ConstraintLayout>
+
+</ScrollView>
