@@ -10,8 +10,9 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
-import butterknife.BindView;
+
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -30,13 +31,18 @@ import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.di.ViewModelFactory;
 import com.jamargle.bakineando.domain.model.Step;
 import com.jamargle.bakineando.presentation.BaseFragment;
+import com.squareup.picasso.Picasso;
+
 import javax.inject.Inject;
+
+import butterknife.BindView;
 
 public final class StepDetailFragment extends BaseFragment<StepDetailFragment.Callback> {
 
     private static final String STEP_TO_SHOW = "key:StepDetailFragment_step_to_show";
 
     @BindView(R.id.short_description) TextView shortDescriptionView;
+    @BindView(R.id.step_image) ImageView stepImage;
     @BindView(R.id.step_video) PlayerView stepVideoView;
     @BindView(R.id.full_description) TextView fullDescriptionView;
 
@@ -134,6 +140,17 @@ public final class StepDetailFragment extends BaseFragment<StepDetailFragment.Ca
                         }
                     } else {
                         stepVideoView.setVisibility(View.GONE);
+
+                        if (!step.getThumbnailURL().isEmpty()
+                                && (step.getThumbnailURL().endsWith(".jpg")
+                                || step.getThumbnailURL().endsWith(".png"))) {
+
+                            stepImage.setVisibility(View.VISIBLE);
+
+                            Picasso.with(getActivity())
+                                    .load(step.getThumbnailURL())
+                                    .into(stepImage);
+                        }
                     }
                 }
             }

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".presentation.stepdetail.StepDetailActivity">
 
     <android.support.constraint.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context=".presentation.stepdetail.StepDetailActivity">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/short_description"
@@ -20,14 +20,30 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Melt butter and bittersweet chocolate." />
 
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/step_video"
+        <FrameLayout
+            android:id="@+id/media_container"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/introduction_video_height"
+            android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/short_description" />
+            app:layout_constraintTop_toBottomOf="@id/short_description">
+
+            <ImageView
+                android:id="@+id/step_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/content_description_step_image"
+                android:scaleType="centerInside"
+                android:visibility="gone" />
+
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/step_video"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/introduction_video_height" />
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/full_description"
@@ -35,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_normal"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_constraintTop_toBottomOf="@id/step_video"
+            app:layout_constraintTop_toBottomOf="@id/media_container"
             tools:text="2. Melt the butter and bittersweet chocolate together in a microwave or a double boiler. If microwaving, heat for 30 seconds at a time, removing bowl and stirring ingredients in between." />
 
     </android.support.constraint.ConstraintLayout>
