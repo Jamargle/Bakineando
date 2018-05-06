@@ -1,7 +1,10 @@
 package com.jamargle.bakineando.data.local;
 
 import android.arch.persistence.room.Database;
+import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.content.Context;
+
 import com.jamargle.bakineando.data.local.dao.IngredientDao;
 import com.jamargle.bakineando.data.local.dao.RecipeDao;
 import com.jamargle.bakineando.data.local.dao.StepDao;
@@ -18,7 +21,18 @@ import com.jamargle.bakineando.domain.model.Step;
         exportSchema = false)
 public abstract class BakingDb extends RoomDatabase {
 
-    public static final String DATABASE_NAME = "recipes_db";
+    private static final String DATABASE_NAME = "recipes_db";
+
+    private static BakingDb dbInstance;
+
+    public static synchronized BakingDb getInstance(final Context context) {
+        if (dbInstance == null) {
+            dbInstance = Room
+                    .databaseBuilder(context.getApplicationContext(), BakingDb.class, DATABASE_NAME)
+                    .build();
+        }
+        return dbInstance;
+    }
 
     public abstract RecipeDao getRecipeDao();
 

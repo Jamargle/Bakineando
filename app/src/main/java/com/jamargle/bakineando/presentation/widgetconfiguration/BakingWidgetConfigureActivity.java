@@ -1,6 +1,7 @@
 package com.jamargle.bakineando.presentation.widgetconfiguration;
 
 import android.appwidget.AppWidgetManager;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,28 +9,25 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
-import com.jamargle.bakineando.R;
-import com.jamargle.bakineando.domain.model.Ingredient;
-import com.jamargle.bakineando.presentation.BaseActivity;
-import com.jamargle.bakineando.util.SharedPreferencesHandler;
-import com.jamargle.bakineando.widget.BakingWidget;
-
-import java.util.ArrayList;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.jamargle.bakineando.R;
+import com.jamargle.bakineando.di.ViewModelFactory;
+import com.jamargle.bakineando.domain.interactor.DefaultObserver;
+import com.jamargle.bakineando.domain.model.Recipe;
+import com.jamargle.bakineando.presentation.BaseActivity;
+import com.jamargle.bakineando.widget.BakingWidget;
+import java.util.List;
+import javax.inject.Inject;
 
 public final class BakingWidgetConfigureActivity extends BaseActivity {
 
     @BindView(R.id.ingredients_radio_group) RadioGroup ingredientsRadioGroup;
 
-    @Inject SharedPreferencesHandler preferencesHandler;
+    @Inject ViewModelFactory viewModelFactory;
 
+    private BakingWidgetConfigureViewModel viewModel;
     private int appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
     @Override
@@ -42,6 +40,7 @@ public final class BakingWidgetConfigureActivity extends BaseActivity {
 
         setContentView(R.layout.baking_widget_configure);
         ButterKnife.bind(this);
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(BakingWidgetConfigureViewModel.class);
 
         appWidgetId = findWidgetIdFromIntent();
 
@@ -51,23 +50,18 @@ public final class BakingWidgetConfigureActivity extends BaseActivity {
             return;
         }
 
-        initWidgetView();
+        initWidgetConfigurationView();
     }
 
     @OnClick(R.id.ok_button)
     public void onClickOkButton() {
         final int checkedItemId = ingredientsRadioGroup.getCheckedRadioButtonId();
-        final String recipeName = ((AppCompatRadioButton) ingredientsRadioGroup.getChildAt(checkedItemId)).getText().toString();
-        preferencesHandler.setWidgetRecipeTitle(recipeName);
+        final String recipeName = getSelectedRecipeName(checkedItemId);
 
         final Context context = getApplicationContext();
         final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
-        final ArrayList<Ingredient> ingredients = new ArrayList<>();
-        ingredients.add(new Ingredient.Builder().ingredient("Ingredasdas 1").build());
-        ingredients.add(new Ingredient.Builder().ingredient("Ingredasdas 2").build());
-        BakingWidget.updateAppWidget(context, appWidgetManager, appWidgetId, recipeName,
-                /*usecase.getIngredients*/ingredients);
+        BakingWidget.updateAppWidget(context, appWidgetManager, appWidgetId, checkedItemId, recipeName);
 
         final Intent resultValue = new Intent();
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
@@ -85,26 +79,38 @@ public final class BakingWidgetConfigureActivity extends BaseActivity {
         return AppWidgetManager.INVALID_APPWIDGET_ID;
     }
 
-    private void initWidgetView() {
-        final Set<String> recipeNames = preferencesHandler.getRecipeNames();
+    private void initWidgetConfigurationView() {
+        viewModel.getRecipes(new DefaultObserver<List<Recipe>>() {
 
-        if (recipeNames.size() == 0) {
-            Toast.makeText(this, R.string.widget_no_recipe_names_warning, Toast.LENGTH_SHORT).show();
-            finish();
+            @Override
+            public void processOnNext(final List<Recipe> recipes) {
+                if (recipes.isEmpty()) {
+                    Toast.makeText(BakingWidgetConfigureActivity.this, R.string.widget_no_recipe_names_warning, Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+                for (final Recipe recipe : recipes) {
+                    final AppCompatRadioButton radioButton = new AppCompatRadioButton(BakingWidgetConfigureActivity.this);
+                    radioButton.setText(recipe.getName());
+                    radioButton.setId(recipe.getId());
+                    ingredientsRadioGroup.addView(radioButton);
+                }
+
+                if (ingredientsRadioGroup.getChildCount() > 0) {
+                    ((AppCompatRadioButton) ingredientsRadioGroup.getChildAt(0)).setChecked(true);
+                }
+            }
+
+        });
+    }
+
+    private String getSelectedRecipeName(final int checkedItemId) {
+        for (int i = 0; i < ingredientsRadioGroup.getChildCount(); i++) {
+            if (checkedItemId == ingredientsRadioGroup.getChildAt(i).getId()) {
+                return ((AppCompatRadioButton) ingredientsRadioGroup.getChildAt(i)).getText().toString();
+            }
         }
-
-        int currentIndex = 0;
-
-        for (final String name : recipeNames) {
-            final AppCompatRadioButton radioButton = new AppCompatRadioButton(this);
-            radioButton.setText(name);
-            radioButton.setId(currentIndex++);
-            ingredientsRadioGroup.addView(radioButton);
-        }
-
-        if (ingredientsRadioGroup.getChildCount() > 0) {
-            ((AppCompatRadioButton) ingredientsRadioGroup.getChildAt(0)).setChecked(true);
-        }
+        return null;
     }
 
 }

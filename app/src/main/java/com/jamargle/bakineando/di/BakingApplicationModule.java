@@ -6,14 +6,18 @@ import android.content.SharedPreferences;
 import com.jamargle.bakineando.BakineandoApp;
 import com.jamargle.bakineando.data.JobExecutor;
 import com.jamargle.bakineando.data.UiThread;
+import com.jamargle.bakineando.domain.interactor.FetchRecipesUseCase;
 import com.jamargle.bakineando.domain.interactor.PostExecutionThread;
 import com.jamargle.bakineando.domain.interactor.ThreadExecutor;
+import com.jamargle.bakineando.domain.interactor.UseCase;
+import com.jamargle.bakineando.domain.model.Recipe;
 import com.jamargle.bakineando.util.SharedPreferencesHandler;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import java.util.List;
 
 @Module(
         includes = {
@@ -21,7 +25,8 @@ import dagger.Provides;
         },
         subcomponents = {
                 RecipeListFragmentComponent.class,
-                RecipeDetailFragmentComponent.class
+                RecipeDetailFragmentComponent.class,
+                StepDetailFragmentComponent.class
         })
 public final class BakingApplicationModule {
 
@@ -50,6 +55,12 @@ public final class BakingApplicationModule {
     public SharedPreferencesHandler provideSharedPreferencesHandler(final Context context) {
         final SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         return new SharedPreferencesHandler(sharedPreferences);
+    }
+
+    @Provides
+    @Singleton
+    public UseCase<Void, List<Recipe>> providesFetchRecipesUseCase(final FetchRecipesUseCase useCase) {
+        return useCase;
     }
 
 }

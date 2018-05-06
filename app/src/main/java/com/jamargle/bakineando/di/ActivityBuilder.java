@@ -20,7 +20,7 @@ public abstract class ActivityBuilder {
     @ContributesAndroidInjector(modules = FragmentBuilder.class)
     public abstract StepDetailActivity bindStepDetailActivity();
 
-    @ContributesAndroidInjector(modules = FragmentBuilder.class)
+    @ContributesAndroidInjector(modules = WidgetConfigurationActivityModule.class)
     public abstract BakingWidgetConfigureActivity bindBakingWidgetConfigureActivity();
 
 }
