@@ -1,17 +1,19 @@
 package com.jamargle.bakineando.di;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.jamargle.bakineando.BakineandoApp;
 import com.jamargle.bakineando.data.JobExecutor;
 import com.jamargle.bakineando.data.UiThread;
 import com.jamargle.bakineando.domain.interactor.PostExecutionThread;
 import com.jamargle.bakineando.domain.interactor.ThreadExecutor;
-import javax.inject.Named;
+import com.jamargle.bakineando.util.SharedPreferencesHandler;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import io.reactivex.Scheduler;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 @Module(
         includes = {
@@ -23,22 +25,7 @@ import io.reactivex.schedulers.Schedulers;
         })
 public final class BakingApplicationModule {
 
-    public static final String SCHEDULER_MAIN_THREAD = "mainThread_scheduler";
-    public static final String SCHEDULER_IO = "io_scheduler";
-
-    @Provides
-    @Singleton
-    @Named(SCHEDULER_MAIN_THREAD)
-    public Scheduler provideMainThreadScheduler() {
-        return AndroidSchedulers.mainThread();
-    }
-
-    @Provides
-    @Singleton
-    @Named(SCHEDULER_IO)
-    public Scheduler provideIoScheduler() {
-        return Schedulers.io();
-    }
+    private static final String SHARED_PREFERENCES_NAME = "bakeando_shared_preferences";
 
     @Provides
     @Singleton
@@ -50,6 +37,19 @@ public final class BakingApplicationModule {
     @Singleton
     public PostExecutionThread providePostExecutionThread() {
         return new UiThread();
+    }
+
+    @Provides
+    @Singleton
+    Context provideApplicationContext(final BakineandoApp application) {
+        return application;
+    }
+
+    @Provides
+    @Singleton
+    public SharedPreferencesHandler provideSharedPreferencesHandler(final Context context) {
+        final SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        return new SharedPreferencesHandler(sharedPreferences);
     }
 
 }
