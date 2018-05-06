@@ -20,8 +20,10 @@
     <string name="select_recipe">Select a recipe:</string>
     <string name="ok">OK</string>
 
+    <string name="widget_no_recipe_names_warning">Recipe names are not available right now</string>
     <string name="recipe_details_ingredient_line" translatable="false">
     <xliff:g id="bullet">\u2022</xliff:g> <xliff:g id="name">%s</xliff:g>
     (<xliff:g id="quantity">%s</xliff:g> <xliff:g id="measure">%s</xliff:g>)
   </string>
+
 </resources>

@@ -13,4 +13,12 @@ public final class SharedPreferencesHandler {
         this.sharedPreferences = preferences;
     }
 
+    public void setWidgetRecipeTitle(final String title) {
+        sharedPreferences.edit().putString(WIDGET_RECIPE_TITLE, title).apply();
+    }
+
+    public Set<String> getRecipeNames() {
+        return sharedPreferences.getStringSet(WIDGET_RECIPE_LIST, new HashSet<String>(0));
+    }
+
 }
