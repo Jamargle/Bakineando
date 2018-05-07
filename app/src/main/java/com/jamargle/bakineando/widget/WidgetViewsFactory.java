@@ -1,4 +1,4 @@
-package com.jamargle.bakineando.presentation.widget;
+package com.jamargle.bakineando.widget;
 
 import android.content.Context;
 import android.content.Intent;
