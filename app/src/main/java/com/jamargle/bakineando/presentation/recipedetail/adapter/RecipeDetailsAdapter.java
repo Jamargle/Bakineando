@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.domain.model.Ingredient;
 import com.jamargle.bakineando.domain.model.Step;
+import com.jamargle.bakineando.util.IngredientListUtil;
 import com.jamargle.bakineando.util.stickyheader.StickyHeaderAdapter;
 import java.util.List;
 
@@ -212,7 +213,10 @@ public final class RecipeDetailsAdapter
         void bindItem(@NonNull final IngredientItem item) {
             final Ingredient ingredient = item.getItem();
             ingredientName.setText(ingredient.getName());
-            final String quantityLabel = ingredient.getQuantity() + " " + ingredient.getMeasure();
+            final String quantityLabel = IngredientListUtil.getIngredientQuantityLabel(
+                    itemView.getContext(),
+                    ingredient.getQuantity(),
+                    ingredient.getMeasure());
             ingredientQuantity.setText(quantityLabel);
         }
     }
