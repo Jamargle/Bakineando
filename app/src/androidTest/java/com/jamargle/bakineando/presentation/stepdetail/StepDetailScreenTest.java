@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.not;
 @RunWith(AndroidJUnit4.class)
 public class StepDetailScreenTest {
 
-    private static final String STEP_TO_SHOW = "param:step_to_show";
+    public static final String STEP_TO_SHOW = "param:step_to_show";
 
     private static final Step EXPECTED_STEP = new Step.Builder()
             .videoURL("")

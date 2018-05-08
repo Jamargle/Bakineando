@@ -38,16 +38,19 @@ public final class RecipeDetailsAdapterItemsUtil {
                         recipe.getSteps().size());
 
         final List<Step> steps = new ArrayList<>(recipe.getSteps());
-        if (INTRODUCTION_TEXT.equals(steps.get(0).getShortDescription())) {
+        if (!steps.isEmpty() && INTRODUCTION_TEXT.equals(steps.get(0).getShortDescription())) {
             final Step introduction = steps.remove(0);
             items.add(new IntroductionItem(introduction));
         }
-
-        for (final Ingredient ingredient : recipe.getIngredients()) {
-            items.add(new IngredientItem(ingredient));
+        if (recipe.getIngredients() != null) {
+            for (final Ingredient ingredient : recipe.getIngredients()) {
+                items.add(new IngredientItem(ingredient));
+            }
         }
-        for (final Step step : steps) {
-            items.add(new StepItem(step));
+        if (!steps.isEmpty()) {
+            for (final Step step : steps) {
+                items.add(new StepItem(step));
+            }
         }
 
         return items;

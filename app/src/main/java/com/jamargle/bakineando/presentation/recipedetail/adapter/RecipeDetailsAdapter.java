@@ -194,7 +194,8 @@ public final class RecipeDetailsAdapter
 
         void bindItem(@NonNull final IntroductionItem item) {
             final Step introductionStep = item.getItem();
-            if (!introductionStep.getVideoURL().isEmpty()) {
+            if (introductionStep.getVideoURL() != null
+                    && !introductionStep.getVideoURL().isEmpty()) {
                 videoListener.onVideoViewToBePrepared(videoView, Uri.parse(introductionStep.getVideoURL()));
             }
         }
