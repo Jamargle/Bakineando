@@ -95,11 +95,13 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
 
     private void initViewModel() {
         recipeListViewModel = ViewModelProviders.of(this, viewModelFactory).get(RecipeListViewModel.class);
+        callback.onRecipesRetrieving();
         recipeListViewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
 
             @Override
             public void onChanged(@Nullable final List<Recipe> recipes) {
                 adapter.updateRecipes(recipes);
+                callback.onRecipesReady();
             }
 
         });
@@ -126,6 +128,10 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
     }
 
     interface Callback {
+
+        void onRecipesRetrieving();
+
+        void onRecipesReady();
 
         void onRecipeClicked(Recipe recipe);
 

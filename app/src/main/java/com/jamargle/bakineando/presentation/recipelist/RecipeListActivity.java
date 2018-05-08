@@ -2,6 +2,9 @@ package com.jamargle.bakineando.presentation.recipelist;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 
 import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.domain.model.Recipe;
@@ -16,12 +19,27 @@ public final class RecipeListActivity extends BaseActivity
         RecipeDetailFragment.Callback {
 
     private boolean isTwoPane;
+    private RecipesIdlingResource idlingResource;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
         initFragments();
+    }
+
+    @Override
+    public void onRecipesRetrieving() {
+        if (idlingResource != null) {
+            idlingResource.setIdleState(false);
+        }
+    }
+
+    @Override
+    public void onRecipesReady() {
+        if (idlingResource != null) {
+            idlingResource.setIdleState(true);
+        }
     }
 
     @Override
@@ -33,6 +51,15 @@ public final class RecipeListActivity extends BaseActivity
     public void onStepClicked(Step step) {
         final Intent intent = new Intent(this, StepDetailActivity.class);
         startActivity(intent.putExtras(StepDetailActivity.newBundle(step)));
+    }
+
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (idlingResource == null) {
+            idlingResource = new RecipesIdlingResource();
+        }
+        return idlingResource;
     }
 
     private void initFragments() {

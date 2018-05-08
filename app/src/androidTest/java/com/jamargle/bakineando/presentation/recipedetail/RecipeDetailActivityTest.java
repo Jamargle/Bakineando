@@ -47,7 +47,7 @@ import static org.hamcrest.Matchers.not;
 @RunWith(AndroidJUnit4.class)
 public class RecipeDetailActivityTest {
 
-    private static final String RECIPE_TO_SHOW = "param:recipe_to_show";
+    public static final String RECIPE_TO_SHOW = "param:recipe_to_show";
 
     private final Recipe expectedRecipe = new Recipe.Builder()
             .name("")
