@@ -2,6 +2,7 @@ package com.jamargle.bakineando.presentation.recipelist;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
@@ -48,7 +49,12 @@ public final class RecipeListActivity extends BaseActivity
     }
 
     @Override
-    public void onStepClicked(Step step) {
+    public void openDeviceSettings() {
+        startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+    }
+
+    @Override
+    public void onStepClicked(final Step step) {
         final Intent intent = new Intent(this, StepDetailActivity.class);
         startActivity(intent.putExtras(StepDetailActivity.newBundle(step)));
     }

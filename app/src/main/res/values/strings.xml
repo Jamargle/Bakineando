@@ -6,6 +6,11 @@
     <!-- Recipe list screen -->
     <string name="recipe_list_is_empty">There are no recipes to show</string>
     <string name="content_description_recipe_icon">This is the icon of a recipe</string>
+    <string name="no_internet_title">There is no Internet connection</string>
+    <string name="enable_internet_message">Please, enable Internet to see the movies information.</string>
+    <string name="go_to_settings">Go to Settings</string>
+
+    <!-- Step details screen -->
     <string name="servings_number">Servings %1s</string>
     <string name="recipe_introduction">Recipe Introduction</string>
     <string name="recipe_introduction_list_header">Recipe introduction:</string>

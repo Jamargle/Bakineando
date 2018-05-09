@@ -2,10 +2,15 @@ package com.jamargle.bakineando.presentation.recipelist;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -78,6 +83,12 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        startSeeingRecipes();
+    }
+
+    @Override
     protected boolean isToBeRetained() {
         return true;
     }
@@ -85,6 +96,11 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
     @Override
     protected int getLayoutResourceId() {
         return R.layout.fragment_recipe_list;
+    }
+
+    @Override
+    public void onRecipeClicked(final Recipe recipe) {
+        callback.onRecipeClicked(recipe);
     }
 
     private void initRecyclerView() {
@@ -96,20 +112,7 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
     private void initViewModel() {
         recipeListViewModel = ViewModelProviders.of(this, viewModelFactory).get(RecipeListViewModel.class);
         callback.onRecipesRetrieving();
-        recipeListViewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
-
-            @Override
-            public void onChanged(@Nullable final List<Recipe> recipes) {
-                adapter.updateRecipes(recipes);
-                callback.onRecipesReady();
-            }
-
-        });
-    }
-
-    @Override
-    public void onRecipeClicked(final Recipe recipe) {
-        callback.onRecipeClicked(recipe);
+        startSeeingRecipes();
     }
 
     private void scrollToSavedScrollPosition(final int position) {
@@ -127,6 +130,64 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
         }, delay);
     }
 
+    private boolean hasNetworkConnection() {
+        if (getActivity() != null) {
+            final ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivityManager != null) {
+                final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                return networkInfo != null && networkInfo.isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+
+    private void startSeeingRecipes() {
+        if (hasNetworkConnection()) {
+            recipeListViewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
+
+                @Override
+                public void onChanged(@Nullable final List<Recipe> recipes) {
+                    adapter.updateRecipes(recipes);
+                    callback.onRecipesReady();
+                }
+
+            });
+        } else {
+            showNoInternetConnectionMessage();
+        }
+    }
+
+    private void showNoInternetConnectionMessage() {
+        if (getActivity() == null) {
+            return;
+        }
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.no_internet_title)
+                .setMessage(R.string.enable_internet_message)
+                .setPositiveButton(R.string.go_to_settings, new DialogInterface.OnClickListener() {
+                    public void onClick(
+                            final DialogInterface dialog,
+                            final int which) {
+
+                        openDeviceSettings();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(
+                            final DialogInterface dialog,
+                            final int which) {
+
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+    private void openDeviceSettings() {
+        callback.openDeviceSettings();
+    }
+
     interface Callback {
 
         void onRecipesRetrieving();
@@ -134,6 +195,8 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
         void onRecipesReady();
 
         void onRecipeClicked(Recipe recipe);
+
+        void openDeviceSettings();
 
     }
 
