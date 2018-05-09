@@ -50,6 +50,10 @@ public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdap
         }
     }
 
+
+
+    poner que empty view en las pantallas y loadings
+
     @Override
     public int getItemCount() {
         return recipeDataset.size();
