@@ -112,9 +112,7 @@ public final class StepDetailFragment extends BaseFragment<StepDetailFragment.Ca
     @Override
     public void onResume() {
         super.onResume();
-        if (videoUri != null) {
-            initializePlayer();
-        }
+        initializePlayer();
     }
 
     @Override
