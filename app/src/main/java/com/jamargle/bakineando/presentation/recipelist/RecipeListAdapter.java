@@ -5,10 +5,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.domain.model.Recipe;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -79,6 +81,7 @@ public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdap
 
     final class RecipeViewHolder extends RecyclerView.ViewHolder {
 
+        @BindView(R.id.recipe_icon) ImageView recipeIcon;
         @BindView(R.id.recipe_name) TextView recipeName;
         @BindView(R.id.recipe_servings) TextView recipeServings;
 
@@ -96,6 +99,11 @@ public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdap
         }
 
         void bindRecipe(final Recipe recipe) {
+            if (!recipe.getImage().isEmpty()) {
+                Picasso.with(itemView.getContext())
+                        .load(recipe.getImage())
+                        .into(recipeIcon);
+            }
             recipeName.setText(recipe.getName());
             final String servingsLabel = recipeServings.getResources()
                     .getString(R.string.servings_number, recipe.getServings());
