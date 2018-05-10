@@ -17,6 +17,7 @@ import javax.inject.Singleton;
 public final class RecipeListViewModel extends ViewModel {
 
     private final FetchRecipesUseCase useCase;
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
 
     @Inject
     public RecipeListViewModel(final FetchRecipesUseCase useCase) {
@@ -24,17 +25,23 @@ public final class RecipeListViewModel extends ViewModel {
     }
 
     LiveData<List<Recipe>> getRecipes() {
+        isLoading.setValue(true);
         final MutableLiveData<List<Recipe>> liveData = new MutableLiveData<>();
         useCase.execute(null, new DefaultObserver<List<Recipe>>() {
 
             @Override
             public void processOnNext(final List<Recipe> recipes) {
                 liveData.setValue(recipes);
+                isLoading.setValue(false);
             }
 
         });
 
         return liveData;
+    }
+
+    LiveData<Boolean> getLoadingState() {
+        return isLoading;
     }
 
 }

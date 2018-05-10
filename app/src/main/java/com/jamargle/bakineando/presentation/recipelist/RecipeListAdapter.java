@@ -7,29 +7,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.jamargle.bakineando.R;
-import com.jamargle.bakineando.domain.model.Recipe;
-import com.squareup.picasso.Picasso;
-
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.jamargle.bakineando.R;
+import com.jamargle.bakineando.domain.model.Recipe;
+import com.squareup.picasso.Picasso;
+import java.util.List;
 
 public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.RecipeViewHolder> {
 
     private final List<Recipe> recipeDataset;
     private final OnRecipeClickListener listener;
+    private final OnRecipeCountListener countListener;
     private int selectedPosition = -1;
 
     RecipeListAdapter(
             @NonNull final List<Recipe> recipeList,
-            @NonNull final OnRecipeClickListener listener) {
+            @NonNull final OnRecipeClickListener listener,
+            @NonNull final OnRecipeCountListener countListener) {
 
         recipeDataset = recipeList;
         this.listener = listener;
+        this.countListener = countListener;
     }
 
     @Override
@@ -50,10 +50,6 @@ public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdap
         }
     }
 
-
-
-    poner que empty view en las pantallas y loadings
-
     @Override
     public int getItemCount() {
         return recipeDataset.size();
@@ -64,6 +60,12 @@ public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdap
         recipeDataset.addAll(newDataSet);
 
         notifyDataSetChanged();
+
+        if (recipeDataset.isEmpty()) {
+            countListener.onNoRecipesToShow();
+        } else {
+            countListener.onRecipesToShowPrepared();
+        }
     }
 
     public int getSelectedPosition() {
@@ -80,6 +82,14 @@ public final class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdap
     public interface OnRecipeClickListener {
 
         void onRecipeClicked(Recipe recipe);
+
+    }
+
+    public interface OnRecipeCountListener {
+
+        void onNoRecipesToShow();
+
+        void onRecipesToShowPrepared();
 
     }
 

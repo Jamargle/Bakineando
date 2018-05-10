@@ -16,7 +16,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import butterknife.BindView;
 import com.jamargle.bakineando.R;
 import com.jamargle.bakineando.di.ViewModelFactory;
 import com.jamargle.bakineando.domain.model.Recipe;
@@ -27,15 +29,16 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
-
 public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Callback>
-        implements RecipeListAdapter.OnRecipeClickListener {
+        implements RecipeListAdapter.OnRecipeClickListener,
+        RecipeListAdapter.OnRecipeCountListener {
 
     private static final String SAVED_SCROLL_POSITION = "key:RecipeListFragment_scroll_position";
     private static final String SAVED_SELECTED_POSITION = "key:RecipeListFragment_selected_position";
 
     @BindView(R.id.recipes_recycler_view) RecyclerView recipeListView;
+    @BindView(R.id.empty_list) TextView emptyListView;
+    @BindView(R.id.recipes_loading) ProgressBar loadingView;
 
     @Inject ViewModelFactory viewModelFactory;
 
@@ -103,16 +106,57 @@ public final class RecipeListFragment extends BaseFragment<RecipeListFragment.Ca
         callback.onRecipeClicked(recipe);
     }
 
+    @Override
+    public void onNoRecipesToShow() {
+        recipeListView.setVisibility(View.GONE);
+        emptyListView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onRecipesToShowPrepared() {
+        recipeListView.setVisibility(View.VISIBLE);
+        emptyListView.setVisibility(View.GONE);
+    }
+
     private void initRecyclerView() {
         recipeListView.setHasFixedSize(true);
-        adapter = new RecipeListAdapter(new ArrayList<Recipe>(), this);
+        adapter = new RecipeListAdapter(new ArrayList<Recipe>(), this, this);
         recipeListView.setAdapter(adapter);
     }
 
     private void initViewModel() {
         recipeListViewModel = ViewModelProviders.of(this, viewModelFactory).get(RecipeListViewModel.class);
         callback.onRecipesRetrieving();
-        startSeeingRecipes();
+        recipeListViewModel.getLoadingState().observe(this, new Observer<Boolean>() {
+
+            @Override
+            public void onChanged(@Nullable final Boolean isLoading) {
+                if (isLoading == null) {
+                    return;
+                }
+                if (isLoading) {
+                    showLoading();
+                } else {
+                    hideLoading();
+                }
+            }
+
+        });
+    }
+
+    private void showLoading() {
+        if (loadingView != null) {
+            recipeListView.setVisibility(View.GONE);
+            loadingView.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    private void hideLoading() {
+        if (loadingView != null) {
+            loadingView.setVisibility(View.GONE);
+            recipeListView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void scrollToSavedScrollPosition(final int position) {
