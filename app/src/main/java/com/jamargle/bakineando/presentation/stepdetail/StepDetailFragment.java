@@ -13,8 +13,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackPreparer;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
@@ -37,9 +42,15 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 
-public final class StepDetailFragment extends BaseFragment<StepDetailFragment.Callback> {
+public final class StepDetailFragment extends BaseFragment<StepDetailFragment.Callback>
+        implements PlaybackPreparer {
 
     private static final String STEP_TO_SHOW = "key:StepDetailFragment_step_to_show";
+
+    private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
+    private static final String KEY_AUTO_PLAY = "key:StepDetailFragment_auto_play";
+    private static final String KEY_WINDOW = "key:StepDetailFragment_start_window";
+    private static final String KEY_POSITION = "key:StepDetailFragment_start_position";
 
     @BindView(R.id.short_description) TextView shortDescriptionView;
     @BindView(R.id.step_image) ImageView stepImage;
@@ -50,7 +61,11 @@ public final class StepDetailFragment extends BaseFragment<StepDetailFragment.Ca
 
     private StepDetailViewModel stepDetailsViewModel;
     private SimpleExoPlayer player = null;
+    private MediaSource mediaSource;
     private Uri videoUri = null;
+    private boolean startAutoPlay;
+    private int startWindow;
+    private long startPosition;
 
     public StepDetailFragment() {
     }
@@ -75,34 +90,35 @@ public final class StepDetailFragment extends BaseFragment<StepDetailFragment.Ca
     }
 
     @Override
+    public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            startAutoPlay = savedInstanceState.getBoolean(KEY_AUTO_PLAY);
+            startWindow = savedInstanceState.getInt(KEY_WINDOW);
+            startPosition = savedInstanceState.getLong(KEY_POSITION);
+        } else {
+            clearStartPosition();
+        }
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
+        updateStartPosition();
+        outState.putBoolean(KEY_AUTO_PLAY, startAutoPlay);
+        outState.putInt(KEY_WINDOW, startWindow);
+        outState.putLong(KEY_POSITION, startPosition);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        if (videoUri != null) {
-            final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            if (player == null) {
-                player = initPlayer(bandwidthMeter);
-            }
-            if (player != null) {
-                player.prepare(getVideoSource(videoUri, getActivity(), bandwidthMeter));
-                player.setPlayWhenReady(true);
-            }
-        }
+        initializePlayer();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (player != null) {
-            player.stop();
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (player != null) {
-            player.release();
-        }
+        releasePlayer();
     }
 
     @Override
@@ -113,6 +129,11 @@ public final class StepDetailFragment extends BaseFragment<StepDetailFragment.Ca
     @Override
     protected int getLayoutResourceId() {
         return R.layout.fragment_step_details;
+    }
+
+    @Override
+    public void preparePlayback() {
+        initializePlayer();
     }
 
     private void initViewModel() {
@@ -127,17 +148,8 @@ public final class StepDetailFragment extends BaseFragment<StepDetailFragment.Ca
 
                     if (!step.getVideoURL().isEmpty()) {
                         videoUri = Uri.parse(step.getVideoURL());
+                        initializePlayer();
 
-                        final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-                        if (player == null) {
-                            player = initPlayer(bandwidthMeter);
-                        }
-                        stepVideoView.setPlayer(player);
-
-                        if (getActivity() != null) {
-                            player.prepare(getVideoSource(videoUri, getActivity(), bandwidthMeter));
-                            player.setPlayWhenReady(true);
-                        }
                     } else {
                         stepVideoView.setVisibility(View.GONE);
 
@@ -162,27 +174,91 @@ public final class StepDetailFragment extends BaseFragment<StepDetailFragment.Ca
         }
     }
 
-    @Nullable
-    private SimpleExoPlayer initPlayer(final DefaultBandwidthMeter bandwidthMeter) {
-        final Context context = getActivity();
-        if (context == null) {
-            return null;
+    private void initializePlayer() {
+        if (videoUri == null) {
+            return;
         }
-        final TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        final TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-        return ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+        final Context context = getActivity();
+        if (player == null && context != null) {
+            player = ExoPlayerFactory.newSimpleInstance(context, createTrackSelector());
+            player.addListener(new Player.DefaultEventListener() {
+                @Override
+                public void onPlayerError(final ExoPlaybackException error) {
+                    if (isBehindLiveWindow(error)) {
+                        clearStartPosition();
+                        initializePlayer();
+                    } else {
+                        updateStartPosition();
+                    }
+                }
+            });
+            player.setPlayWhenReady(startAutoPlay);
+            stepVideoView.setPlayer(player);
+            stepVideoView.setPlaybackPreparer(this);
+        }
+        boolean haveStartPosition = startWindow != C.INDEX_UNSET;
+        if (haveStartPosition) {
+            if (player != null) {
+                player.seekTo(startWindow, startPosition);
+            }
+        }
+        if (player != null) {
+            mediaSource = getVideoSource(videoUri, context);
+            player.prepare(mediaSource, !haveStartPosition, false);
+        }
+    }
+
+    private boolean isBehindLiveWindow(final ExoPlaybackException exception) {
+        if (exception.type != ExoPlaybackException.TYPE_SOURCE) {
+            return false;
+        }
+        Throwable cause = exception.getSourceException();
+        while (cause != null) {
+            if (cause instanceof BehindLiveWindowException) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 
     private MediaSource getVideoSource(
-            final Uri mediaUri,
-            final Context context,
-            final DefaultBandwidthMeter bandwidthMeter) {
+            @NonNull final Uri mediaUri,
+            final Context context) {
 
         final DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
                 context,
-                Util.getUserAgent(context, BuildConfig.APPLICATION_ID), bandwidthMeter);
+                Util.getUserAgent(context, BuildConfig.APPLICATION_ID), BANDWIDTH_METER);
         final ExtractorMediaSource.Factory factory = new ExtractorMediaSource.Factory(dataSourceFactory);
         return factory.createMediaSource(mediaUri);
+    }
+
+    private void releasePlayer() {
+        if (player != null) {
+            updateStartPosition();
+            player.release();
+            player = null;
+            mediaSource = null;
+        }
+    }
+
+    private void updateStartPosition() {
+        if (player != null) {
+            startAutoPlay = player.getPlayWhenReady();
+            startWindow = player.getCurrentWindowIndex();
+            startPosition = Math.max(0, player.getContentPosition());
+        }
+    }
+
+    private void clearStartPosition() {
+        startAutoPlay = true;
+        startWindow = C.INDEX_UNSET;
+        startPosition = C.TIME_UNSET;
+    }
+
+    private TrackSelector createTrackSelector() {
+        final TrackSelection.Factory trackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
+        return new DefaultTrackSelector(trackSelectionFactory);
     }
 
     public interface Callback {

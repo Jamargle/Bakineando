@@ -14,9 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
@@ -39,6 +43,7 @@ import com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeDetailsAd
 import com.jamargle.bakineando.presentation.recipedetail.adapter.RecipeItem;
 import com.jamargle.bakineando.util.stickyheader.StickyHeaderDecoration;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -47,11 +52,17 @@ import butterknife.BindView;
 
 public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragment.Callback>
         implements RecipeDetailsAdapter.OnStepClickListener,
-        RecipeDetailsAdapter.VideoItemListener {
+        RecipeDetailsAdapter.VideoItemListener,
+        PlaybackPreparer {
 
     private static final String RECIPE_TO_SHOW = "key:RecipeDetailFragment_recipe_to_show";
     private static final String SAVED_SCROLL_POSITION = "key:RecipeDetailFragment_scroll_position";
     private static final String SAVED_VIDEO_ENDED = "key:RecipeDetailFragment_video_ended";
+
+    private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
+    private static final String KEY_AUTO_PLAY = "key:RecipeDetailFragment_auto_play";
+    private static final String KEY_WINDOW = "key:RecipeDetailFragment_start_window";
+    private static final String KEY_POSITION = "key:RecipeDetailFragment_start_position";
 
     @BindView(R.id.recipe_stuff_list) RecyclerView recipeStuffList;
 
@@ -60,7 +71,12 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
     private RecipeDetailsAdapter adapter;
     private RecipeDetailViewModel recipeDetailsViewModel;
     private SimpleExoPlayer player = null;
+    private WeakReference<PlayerView> playerView;
+    private MediaSource mediaSource;
     private Uri videoUri = null;
+    private boolean startAutoPlay;
+    private int startWindow;
+    private long startPosition;
     private boolean isVideoEnded = false;
 
     public RecipeDetailFragment() {
@@ -95,19 +111,24 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
                 final int position = savedInstanceState.getInt(SAVED_SCROLL_POSITION);
                 scrollToSavedScrollPosition(position);
             }
-            if (savedInstanceState.containsKey(SAVED_VIDEO_ENDED)) {
-                isVideoEnded = savedInstanceState.getBoolean(SAVED_VIDEO_ENDED);
-            }
+            isVideoEnded = savedInstanceState.getBoolean(SAVED_VIDEO_ENDED);
+            startAutoPlay = savedInstanceState.getBoolean(KEY_AUTO_PLAY);
+            startWindow = savedInstanceState.getInt(KEY_WINDOW);
+            startPosition = savedInstanceState.getLong(KEY_POSITION);
         }
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         final int position = ((LinearLayoutManager) recipeStuffList.getLayoutManager()).findLastVisibleItemPosition();
         if (position >= 0) {
             outState.putInt(SAVED_SCROLL_POSITION, position);
         }
+        updateStartPosition();
+        outState.putBoolean(KEY_AUTO_PLAY, startAutoPlay);
+        outState.putInt(KEY_WINDOW, startWindow);
+        outState.putLong(KEY_POSITION, startPosition);
         outState.putBoolean(SAVED_VIDEO_ENDED, isVideoEnded);
         super.onSaveInstanceState(outState);
     }
@@ -115,32 +136,13 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
     @Override
     public void onResume() {
         super.onResume();
-        if (!isVideoEnded && videoUri != null) {
-            final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            if (player == null) {
-                player = initPlayer(bandwidthMeter);
-            }
-            if (player != null) {
-                player.prepare(getVideoSource(videoUri, getActivity(), bandwidthMeter));
-                player.setPlayWhenReady(true);
-            }
-        }
+        initializePlayer();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (player != null) {
-            player.stop();
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (player != null) {
-            player.release();
-        }
+        releasePlayer();
     }
 
     @Override
@@ -166,24 +168,19 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
             final PlayerView playerView,
             final Uri mediaUri) {
 
-        final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        if (player == null) {
-            player = initPlayer(bandwidthMeter);
-        }
-        playerView.setPlayer(player);
-
-        if (getActivity() != null) {
-            videoUri = mediaUri;
-            player.prepare(getVideoSource(videoUri, getActivity(), bandwidthMeter));
-            player.setPlayWhenReady(true);
-        }
+        this.playerView = new WeakReference<>(playerView);
+        videoUri = mediaUri;
+        initializePlayer();
     }
 
     @Override
     public void onVideoViewToBeStopped() {
-        if (player != null) {
-            player.stop();
-        }
+        releasePlayer();
+    }
+
+    @Override
+    public void preparePlayback() {
+        initializePlayer();
     }
 
     private void initRecyclerView(final Context context) {
@@ -230,45 +227,105 @@ public final class RecipeDetailFragment extends BaseFragment<RecipeDetailFragmen
         }, delay);
     }
 
-    @Nullable
-    private SimpleExoPlayer initPlayer(final DefaultBandwidthMeter bandwidthMeter) {
-        final Context context = getActivity();
-        if (context == null) {
-            return null;
+    private void initializePlayer() {
+        if (videoUri == null || playerView.get() == null) {
+            return;
         }
-        final TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        final TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-        final SimpleExoPlayer simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
-        simpleExoPlayer.addListener(new Player.DefaultEventListener() {
+        final Context context = getActivity();
+        if (player == null && context != null) {
+            player = ExoPlayerFactory.newSimpleInstance(context, createTrackSelector());
+            player.addListener(new Player.DefaultEventListener() {
+                @Override
+                public void onPlayerStateChanged(
+                        final boolean playWhenReady,
+                        final int playbackState) {
 
-            @Override
-            public void onPlayerStateChanged(
-                    final boolean playWhenReady,
-                    final int playbackState) {
-
-                switch (playbackState) {
-                    case Player.STATE_ENDED:
-                        isVideoEnded = true;
-                        break;
-                    default:
-                        // Do nothing
+                    switch (playbackState) {
+                        case Player.STATE_ENDED:
+                            isVideoEnded = true;
+                            break;
+                        default:
+                            // Do nothing
+                    }
                 }
-            }
 
-        });
-        return simpleExoPlayer;
+                @Override
+                public void onPlayerError(final ExoPlaybackException error) {
+                    if (isBehindLiveWindow(error)) {
+                        clearStartPosition();
+                        initializePlayer();
+                    } else {
+                        updateStartPosition();
+                    }
+                }
+            });
+            player.setPlayWhenReady(startAutoPlay);
+            playerView.get().setPlayer(player);
+            playerView.get().setPlaybackPreparer(this);
+        }
+        boolean haveStartPosition = startWindow != C.INDEX_UNSET;
+        if (haveStartPosition) {
+            if (player != null) {
+                player.seekTo(startWindow, startPosition);
+            }
+        }
+        if (player != null) {
+            mediaSource = getVideoSource(videoUri, context);
+            player.prepare(mediaSource, !haveStartPosition, false);
+        }
+    }
+
+    private boolean isBehindLiveWindow(final ExoPlaybackException exception) {
+        if (exception.type != ExoPlaybackException.TYPE_SOURCE) {
+            return false;
+        }
+        Throwable cause = exception.getSourceException();
+        while (cause != null) {
+            if (cause instanceof BehindLiveWindowException) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 
     private MediaSource getVideoSource(
-            final Uri mediaUri,
-            final Context context,
-            final DefaultBandwidthMeter bandwidthMeter) {
+            @NonNull final Uri mediaUri,
+            final Context context) {
 
         final DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
                 context,
-                Util.getUserAgent(context, BuildConfig.APPLICATION_ID), bandwidthMeter);
+                Util.getUserAgent(context, BuildConfig.APPLICATION_ID), BANDWIDTH_METER);
         final ExtractorMediaSource.Factory factory = new ExtractorMediaSource.Factory(dataSourceFactory);
         return factory.createMediaSource(mediaUri);
+    }
+
+    private void releasePlayer() {
+        if (player != null) {
+            updateStartPosition();
+            player.release();
+            player = null;
+            mediaSource = null;
+        }
+    }
+
+    private void updateStartPosition() {
+        if (player != null) {
+            startAutoPlay = player.getPlayWhenReady();
+            startWindow = player.getCurrentWindowIndex();
+            startPosition = Math.max(0, player.getContentPosition());
+        }
+    }
+
+    private void clearStartPosition() {
+        startAutoPlay = true;
+        startWindow = C.INDEX_UNSET;
+        startPosition = C.TIME_UNSET;
+    }
+
+    private TrackSelector createTrackSelector() {
+        final TrackSelection.Factory trackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
+        return new DefaultTrackSelector(trackSelectionFactory);
     }
 
     public interface Callback {
